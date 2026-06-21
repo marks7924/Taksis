@@ -93,7 +93,7 @@ export default function Header() {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden text-burgundy-800 p-2 hover:bg-gold-500/10 rounded-lg transition-colors"
+              className="xl:hidden text-burgundy-800 p-2 hover:bg-gold-500/10 rounded-lg transition-colors"
               aria-label={isAr ? "القائمة" : "Menu"}
             >
               <Menu className="w-6 h-6" />
@@ -111,7 +111,7 @@ export default function Header() {
           </div>
 
           {/* Center Section: Navigation Links (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden xl:flex items-center gap-5">
             {mainLinks.map((link) => {
               const isActive = pathname === link.path;
               return (
@@ -192,14 +192,14 @@ export default function Header() {
               </button>
 
               {isUserMenuOpen && (
-                <div className="absolute left-0 mt-2 w-56 bg-ivory-100 rounded-lg shadow-xl border border-gold-500/20 py-2 z-50 animate-fade-in-down text-navy-900 text-right">
+                <div className={`absolute ${isAr ? "left-0" : "right-0"} mt-2 w-56 bg-ivory-100 rounded-lg shadow-xl border border-gold-500/20 py-2 z-50 animate-fade-in-down text-navy-900 ${isAr ? "text-right" : "text-left"}`}>
                   {currentUser ? (
                     <>
                       <div className="px-4 py-2 border-b border-gold-500/10">
                         <p className="font-bold text-sm text-burgundy-800">{currentUser.fullName}</p>
                         <p className="text-xs text-navy-900/60 truncate">{currentUser.email}</p>
                         <p className="text-[10px] mt-1 inline-block bg-gold-500/20 text-gold-600 px-2 py-0.5 rounded">
-                          {currentUser.role === "admin" ? "مدير النظام" : "عميل مميز"}
+                          {currentUser.role === "admin" ? (isAr ? "مدير النظام" : "General Manager") : (isAr ? "عميل مميز" : "Valued Customer")}
                         </p>
                       </div>
                       
@@ -207,20 +207,20 @@ export default function Header() {
                         <Link
                           href="/admin"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 hover:bg-gold-500/10 text-sm font-semibold transition-colors"
+                          className={`flex items-center gap-2 px-4 py-2 hover:bg-gold-500/10 text-sm font-semibold transition-colors ${isAr ? "flex-row" : "flex-row-reverse justify-end"}`}
                         >
                           <LayoutDashboard className="w-4 h-4 text-burgundy-800" />
-                          لوحة تحكم المدير
+                          <span>{isAr ? "لوحة تحكم المدير" : "Admin Dashboard"}</span>
                         </Link>
                       )}
 
                       <Link
                         href="/tracking"
                         onClick={() => setIsUserMenuOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 hover:bg-gold-500/10 text-sm font-semibold transition-colors"
+                        className={`flex items-center gap-2 px-4 py-2 hover:bg-gold-500/10 text-sm font-semibold transition-colors ${isAr ? "flex-row" : "flex-row-reverse justify-end"}`}
                       >
                         <ShoppingCart className="w-4 h-4 text-burgundy-800" />
-                        تتبع طلباتي
+                        <span>{isAr ? "تتبع طلباتي" : "Track My Orders"}</span>
                       </Link>
 
                       <button
@@ -228,34 +228,34 @@ export default function Header() {
                           logoutUser();
                           setIsUserMenuOpen(false);
                         }}
-                        className="w-full text-right flex items-center gap-2 px-4 py-2 hover:bg-red-50 text-red-600 text-sm font-semibold transition-colors border-t border-gold-500/10 mt-1"
+                        className={`w-full ${isAr ? "text-right flex-row" : "text-left flex-row-reverse justify-end"} flex items-center gap-2 px-4 py-2 hover:bg-red-50 text-red-600 text-sm font-semibold transition-colors border-t border-gold-500/10 mt-1 cursor-pointer`}
                       >
                         <LogOut className="w-4 h-4" />
-                        تسجيل الخروج
+                        <span>{isAr ? "تسجيل الخروج" : "Logout"}</span>
                       </button>
                     </>
                   ) : (
                     <>
                       <div className="px-4 py-2 text-xs text-navy-900/60 border-b border-gold-500/10 text-center">
-                        سجل دخولك لتتبع طلباتك وإدارة حسابك
+                        {isAr ? "سجل دخولك لتتبع طلباتك وإدارة حسابك" : "Log in to track orders & manage account"}
                       </div>
                       <button
                         onClick={() => {
                           loginUser("customer@taksis.com");
                           setIsUserMenuOpen(false);
                         }}
-                        className="w-full text-right px-4 py-2 hover:bg-gold-500/10 text-sm font-semibold transition-colors"
+                        className={`w-full ${isAr ? "text-right" : "text-left"} px-4 py-2 hover:bg-gold-500/10 text-sm font-semibold transition-colors cursor-pointer`}
                       >
-                        دخول سريع كعميل
+                        {isAr ? "دخول سريع كعميل" : "Quick Customer Login"}
                       </button>
                       <button
                         onClick={() => {
                           loginUser("taksisdaf@gmail.com");
                           setIsUserMenuOpen(false);
                         }}
-                        className="w-full text-right px-4 py-2 hover:bg-burgundy-800/10 text-sm font-semibold text-burgundy-800 transition-colors"
+                        className={`w-full ${isAr ? "text-right" : "text-left"} px-4 py-2 hover:bg-burgundy-800/10 text-sm font-semibold text-burgundy-800 transition-colors cursor-pointer`}
                       >
-                        دخول سريع كمدير (Admin)
+                        {isAr ? "دخول سريع كمدير (Admin)" : "Quick Admin Login"}
                       </button>
                       <div className="border-t border-gold-500/10 mt-1 pt-1 text-center">
                         <Link 
@@ -263,7 +263,7 @@ export default function Header() {
                           onClick={() => setIsUserMenuOpen(false)} 
                           className="inline-block text-xs font-bold text-gold-600 hover:underline"
                         >
-                          صفحة التسجيل والتحقق
+                          {isAr ? "صفحة التسجيل والتحقق" : "Register / Verify Page"}
                         </Link>
                       </div>
                     </>
@@ -276,10 +276,10 @@ export default function Header() {
             <button
               onClick={() => setIsCartOpen(true)}
               className="bg-gradient-to-r from-burgundy-800 to-burgundy-900 text-gold-300 p-2 sm:px-4 sm:py-2.5 rounded-full flex items-center gap-2 border border-gold-500/30 hover:scale-105 transition-all shadow-md cursor-pointer"
-              title="سلة المشتريات"
+              title={isAr ? "سلة المشتريات" : "Shopping Cart"}
             >
               <ShoppingBag className="w-5 h-5" />
-              <span className="hidden sm:inline font-bold text-xs">{totalItems} قطع - {cartSubtotal} ج.م</span>
+              <span className="hidden sm:inline font-bold text-xs">{isAr ? `${totalItems} قطع - ${cartSubtotal} ج.م` : `${totalItems} items - ${cartSubtotal} EGP`}</span>
               <span className="sm:hidden font-bold text-xs">{totalItems}</span>
             </button>
 
@@ -287,7 +287,7 @@ export default function Header() {
         </div>
 
         {/* Quick Categories Bar (Desktop) */}
-        <div className="hidden lg:block bg-ivory-200 border-t border-gold-500/5 py-2.5">
+        <div className="hidden xl:block bg-ivory-200 border-t border-gold-500/5 py-2.5">
           <div className="max-w-7xl mx-auto px-8 flex items-center justify-center gap-8 text-xs font-semibold text-navy-800">
             {categoriesShort.map((cat, idx) => (
               <Link key={idx} href={cat.path} className="hover:text-burgundy-800 transition-colors flex items-center gap-1.5">
@@ -316,11 +316,11 @@ export default function Header() {
             <div className="p-6 border-b border-gold-500/15 flex items-center justify-between bg-burgundy-800 text-white">
               <div className="flex items-center gap-2">
                 <ShoppingBag className="text-gold-400 w-6 h-6" />
-                <span className="font-bold font-serif text-lg">سلة مشترياتك</span>
+                <span className="font-bold font-serif text-lg">{isAr ? "سلة مشترياتك" : "Your Shopping Cart"}</span>
               </div>
               <button 
                 onClick={() => setIsCartOpen(false)} 
-                className="text-white hover:text-gold-400 p-1.5 rounded-full hover:bg-white/10 transition-all"
+                className="text-white hover:text-gold-400 p-1.5 rounded-full hover:bg-white/10 transition-all cursor-pointer"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -334,15 +334,15 @@ export default function Header() {
                     <ShoppingBag className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-burgundy-800">السلة فارغة حالياً</h3>
-                    <p className="text-sm mt-1">تصفح أقسام المعرض المميزة وأضف مستلزمات المذبح والخدمة</p>
+                    <h3 className="font-bold text-lg text-burgundy-800">{isAr ? "السلة فارغة حالياً" : "Your Cart is Empty"}</h3>
+                    <p className="text-sm mt-1">{isAr ? "تصفح أقسام المعرض المميزة وأضف مستلزمات المذبح والخدمة" : "Browse our collection to add liturgical or deacon supplies."}</p>
                   </div>
                   <Link 
                     href="/shop" 
                     onClick={() => setIsCartOpen(false)}
                     className="mt-2 bg-burgundy-800 hover:bg-burgundy-900 text-gold-300 font-bold px-6 py-2.5 rounded-lg border border-gold-500/30 transition-all text-sm"
                   >
-                    اذهب للمتجر الآن
+                    {isAr ? "اذهب للمتجر الآن" : "Go to Shop Now"}
                   </Link>
                 </div>
               ) : (
@@ -358,9 +358,13 @@ export default function Header() {
                       />
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-sm text-navy-900 truncate">{item.product.name_ar}</h4>
+                        <h4 className="font-bold text-sm text-navy-900 truncate">
+                          {isAr ? item.product.name_ar : item.product.name_en}
+                        </h4>
                         {item.selectedVariant && (
-                          <p className="text-xs text-gold-600 font-medium mt-0.5">المواصفة: {item.selectedVariant}</p>
+                          <p className="text-xs text-gold-600 font-medium mt-0.5">
+                            {isAr ? "المواصفة: " : "Option: "} {item.selectedVariant}
+                          </p>
                         )}
                         <p className="text-xs text-navy-900/50 mt-1">SKU: {item.product.sku}</p>
                         
@@ -369,28 +373,28 @@ export default function Header() {
                           <div className="flex items-center border border-gold-500/20 rounded bg-ivory-200">
                             <button 
                               onClick={() => updateCartQuantity(item.product.id, item.quantity - 1, item.selectedVariant)}
-                              className="px-2 py-1 text-burgundy-800 hover:bg-gold-500/10 transition-colors"
+                              className="px-2 py-1 text-burgundy-800 hover:bg-gold-500/10 transition-colors cursor-pointer"
                             >
                               <Minus className="w-3.5 h-3.5" />
                             </button>
                             <span className="px-3 text-xs font-bold">{item.quantity}</span>
                             <button 
                               onClick={() => updateCartQuantity(item.product.id, item.quantity + 1, item.selectedVariant)}
-                              className="px-2 py-1 text-burgundy-800 hover:bg-gold-500/10 transition-colors"
+                              className="px-2 py-1 text-burgundy-800 hover:bg-gold-500/10 transition-colors cursor-pointer"
                             >
                               <Plus className="w-3.5 h-3.5" />
                             </button>
                           </div>
                           {/* Price */}
-                          <span className="font-bold text-sm text-burgundy-800">{pPrice * item.quantity} ج.م</span>
+                          <span className="font-bold text-sm text-burgundy-800">{item.quantity * pPrice} {isAr ? "ج.م" : "EGP"}</span>
                         </div>
                       </div>
                       
                       {/* Remove Button */}
                       <button 
                         onClick={() => removeFromCart(item.product.id, item.selectedVariant)}
-                        className="absolute top-2 left-2 text-red-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors"
-                        title="إزالة"
+                        className={`absolute top-2 ${isAr ? "left-2" : "right-2"} text-red-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors cursor-pointer`}
+                        title={isAr ? "إزالة" : "Remove"}
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -404,25 +408,25 @@ export default function Header() {
             {cart.length > 0 && (
               <div className="p-6 border-t border-gold-500/15 bg-white space-y-4">
                 <div className="flex justify-between items-center text-sm font-semibold">
-                  <span className="text-navy-900/70">المجموع الفرعي:</span>
-                  <span className="text-burgundy-800 text-lg font-bold">{cartSubtotal} ج.م</span>
+                  <span className="text-navy-900/70">{isAr ? "المجموع الفرعي:" : "Subtotal:"}</span>
+                  <span className="text-burgundy-800 text-lg font-bold">{cartSubtotal} {isAr ? "ج.م" : "EGP"}</span>
                 </div>
                 <p className="text-[10px] text-navy-900/60 leading-relaxed text-center">
-                  الشحن والضرائب يتم حسابهم بدقة في خطوة الدفع الآمن.
+                  {isAr ? "الشحن والضرائب يتم حسابهم بدقة في خطوة الدفع الآمن." : "Shipping and taxes are calculated at checkout."}
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <button 
                     onClick={clearCart}
-                    className="border border-red-500/30 text-red-600 hover:bg-red-50 font-semibold py-3 rounded-lg text-sm transition-all"
+                    className="border border-red-500/30 text-red-600 hover:bg-red-50 font-semibold py-3 rounded-lg text-sm transition-all cursor-pointer"
                   >
-                    تفريغ السلة
+                    {isAr ? "تفريغ السلة" : "Clear Cart"}
                   </button>
                   <Link 
                     href="/checkout" 
                     onClick={() => setIsCartOpen(false)}
                     className="bg-burgundy-800 hover:bg-burgundy-900 text-gold-300 font-bold py-3 rounded-lg text-sm text-center border border-gold-500/30 transition-all shadow-md shadow-burgundy-900/20"
                   >
-                    إتمام الشراء
+                    {isAr ? "إتمام الشراء" : "Checkout"}
                   </Link>
                 </div>
                 <div className="text-center mt-2">
@@ -431,7 +435,7 @@ export default function Header() {
                     onClick={() => setIsCartOpen(false)} 
                     className="text-xs font-bold text-gold-600 hover:underline"
                   >
-                    تعديل الكميات والتفاصيل الكاملة
+                    {isAr ? "تعديل الكميات والتفاصيل الكاملة" : "View Cart & Edit Details"}
                   </Link>
                 </div>
               </div>
@@ -451,7 +455,7 @@ export default function Header() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="ابحث باسم المنتج، كود الـ SKU، أو القسم..."
+                placeholder={isAr ? "ابحث باسم المنتج، كود الـ SKU، أو القسم..." : "Search by product name, SKU, or category..."}
                 className="bg-transparent text-white placeholder-white/60 focus:outline-none w-full text-base font-semibold"
                 autoFocus
               />
@@ -460,7 +464,7 @@ export default function Header() {
                   setIsSearchOpen(false);
                   setSearchQuery("");
                 }}
-                className="text-white/80 hover:text-white bg-white/10 p-1.5 rounded-full hover:bg-white/20 transition-all"
+                className="text-white/80 hover:text-white bg-white/10 p-1.5 rounded-full hover:bg-white/20 transition-all cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -470,14 +474,14 @@ export default function Header() {
             <div className="p-6 max-h-96 overflow-y-auto">
               {searchQuery.trim().length > 0 ? (
                 <div>
-                  <h4 className="text-xs font-bold text-gold-600 uppercase mb-3 tracking-wider">نتائج بحث مقترحة</h4>
+                  <h4 className="text-xs font-bold text-gold-600 uppercase mb-3 tracking-wider">{isAr ? "نتائج بحث مقترحة" : "Suggested Search Results"}</h4>
                   <div className="space-y-3">
                     <Link
                       href={`/shop?q=${encodeURIComponent(searchQuery)}`}
                       onClick={() => setIsSearchOpen(false)}
                       className="block p-3 hover:bg-gold-500/10 rounded-lg text-sm font-semibold text-burgundy-800 transition-colors border border-dashed border-gold-500/10"
                     >
-                      عرض جميع النتائج لـ "{searchQuery}"
+                      {isAr ? `عرض جميع النتائج لـ "${searchQuery}"` : `View all results for "${searchQuery}"`}
                     </Link>
                     
                     {/* Hardcoded matching mock preview for fast typing */}
@@ -492,12 +496,12 @@ export default function Header() {
                         onClick={() => setIsSearchOpen(false)}
                         className="flex items-center gap-3 p-2 hover:bg-gold-500/5 rounded-lg transition-colors border border-transparent hover:border-gold-500/10"
                       >
-                        <img src={prod.images[0]} alt={prod.name_ar} className="w-12 h-12 object-cover rounded border" />
+                        <img src={prod.images[0]} alt={isAr ? prod.name_ar : prod.name_en} className="w-12 h-12 object-cover rounded border" />
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-sm text-navy-900 truncate">{prod.name_ar}</p>
+                          <p className="font-bold text-sm text-navy-900 truncate">{isAr ? prod.name_ar : prod.name_en}</p>
                           <p className="text-xs text-navy-900/50">SKU: {prod.sku}</p>
                         </div>
-                        <span className="font-bold text-sm text-burgundy-800">{prod.discount_price || prod.price} ج.م</span>
+                        <span className="font-bold text-sm text-burgundy-800">{prod.discount_price || prod.price} {isAr ? "ج.م" : "EGP"}</span>
                       </Link>
                     ))}
                     
@@ -507,7 +511,7 @@ export default function Header() {
                       p.sku.toLowerCase().includes(searchQuery.toLowerCase())
                     ).length === 0 && (
                       <div className="text-center py-6 text-navy-900/50 text-sm">
-                        لا توجد نتائج مطابقة، جرب كلمات أخرى مثل "طونية" أو "شورية"
+                        {isAr ? 'لا توجد نتائج مطابقة، جرب كلمات أخرى مثل "طونية" أو "شورية"' : 'No results found, try searching "Tonia" or "Shoria"'}
                       </div>
                     )}
                   </div>
@@ -515,20 +519,20 @@ export default function Header() {
               ) : (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h4 className="text-xs font-bold text-gold-600 uppercase mb-3 tracking-wider">روابط بحث شائعة</h4>
+                    <h4 className="text-xs font-bold text-gold-600 uppercase mb-3 tracking-wider">{isAr ? "روابط بحث شائعة" : "Popular Searches"}</h4>
                     <div className="flex flex-col gap-2">
-                      <Link href="/shop?category=cat-6" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">بدلة كهنوتية</Link>
-                      <Link href="/shop?category=cat-1" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">دفوف كنسية</Link>
-                      <Link href="/shop?category=cat-7" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">شورية نحاس</Link>
-                      <Link href="/shop?category=cat-10" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">أيقونات السيدة العذراء</Link>
+                      <Link href="/shop?category=cat-6" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">{isAr ? "بدلة كهنوتية" : "Clergy Vestments"}</Link>
+                      <Link href="/shop?category=cat-1" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">{isAr ? "دفوف كنسية" : "Church Dafs"}</Link>
+                      <Link href="/shop?category=cat-7" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">{isAr ? "شورية نحاس" : "Brass Shoria"}</Link>
+                      <Link href="/shop?category=cat-10" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">{isAr ? "أيقونات السيدة العذراء" : "Saint Mary Icons"}</Link>
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-gold-600 uppercase mb-3 tracking-wider">خدمات خاصة</h4>
+                    <h4 className="text-xs font-bold text-gold-600 uppercase mb-3 tracking-wider">{isAr ? "خدمات خاصة" : "Special Requests"}</h4>
                     <div className="flex flex-col gap-2">
-                      <Link href="/custom-orders" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">طلب تفصيل مقاسات</Link>
-                      <Link href="/custom-orders" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">طلب حفر خشب مخصص</Link>
-                      <Link href="/branches" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">معارض ومحلات طاكسيس</Link>
+                      <Link href="/custom-orders" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">{isAr ? "طلب تفصيل مقاسات" : "Clergy Vestment Sizing"}</Link>
+                      <Link href="/custom-orders" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">{isAr ? "طلب حفر خشب مخصص" : "Custom Woodwork Request"}</Link>
+                      <Link href="/branches" onClick={() => setIsSearchOpen(false)} className="text-sm font-semibold hover:text-burgundy-800 transition-colors text-navy-800">{isAr ? "معارض ومحلات طاكسيس" : "Our Showrooms"}</Link>
                     </div>
                   </div>
                 </div>
@@ -546,9 +550,9 @@ export default function Header() {
             <div className="p-6 border-b border-gold-500/15 flex items-center justify-between bg-burgundy-800 text-white">
               <div className="flex items-center gap-2">
                 <Bell className="text-gold-400 w-5 h-5" />
-                <span className="font-bold font-serif text-base">مركز الإشعارات</span>
+                <span className="font-bold font-serif text-base">{isAr ? "مركز الإشعارات" : "Notification Center"}</span>
               </div>
-              <button onClick={() => setIsNotifOpen(false)} className="text-white hover:text-gold-400">
+              <button onClick={() => setIsNotifOpen(false)} className="text-white hover:text-gold-400 cursor-pointer">
                 <X className="w-6 h-6" />
               </button>
             </div>
@@ -566,15 +570,17 @@ export default function Header() {
 
       {/* 4. Mobile Menu Drawer */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex">
+        <div className={`fixed inset-0 z-50 flex ${isAr ? "justify-start" : "justify-end"}`}>
           <div onClick={() => setIsMobileMenuOpen(false)} className="fixed inset-0 bg-black/60" />
-          <div className="relative w-80 bg-ivory-100 h-full shadow-2xl flex flex-col z-10 text-right">
-            <div className="p-6 bg-burgundy-900 text-white flex items-center justify-between border-b border-gold-500/10">
+          <div className={`relative w-80 bg-ivory-100 h-full shadow-2xl flex flex-col z-10 ${isAr ? "text-right" : "text-left"}`}>
+            <div className={`p-6 bg-burgundy-900 text-white flex items-center justify-between border-b border-gold-500/10 ${isAr ? "flex-row" : "flex-row-reverse"}`}>
               <div className="flex flex-col">
                 <span className="font-serif text-2xl font-bold">طاكسيس</span>
-                <span className="text-[10px] font-serif text-gold-400 tracking-wider">للشماس والقسيس</span>
+                <span className="text-[10px] font-serif text-gold-400 tracking-wider">
+                  {isAr ? "للشماس والقسيس" : "For Deacon & Priest"}
+                </span>
               </div>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="text-white p-1 hover:bg-white/10 rounded-full">
+              <button onClick={() => setIsMobileMenuOpen(false)} className="text-white p-1 hover:bg-white/10 rounded-full cursor-pointer">
                 <X className="w-6 h-6" />
               </button>
             </div>
@@ -594,7 +600,7 @@ export default function Header() {
               </div>
               
               <div className="border-t border-gold-500/10 pt-6">
-                <h4 className="text-xs font-bold text-gold-600 mb-3">أقسام سريعة</h4>
+                <h4 className="text-xs font-bold text-gold-600 mb-3">{isAr ? "أقسام سريعة" : "Quick Categories"}</h4>
                 <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-navy-800">
                   {categoriesShort.map((cat, idx) => (
                     <Link 
@@ -611,9 +617,9 @@ export default function Header() {
             </div>
             
             <div className="p-6 border-t border-gold-500/10 bg-ivory-200">
-              <p className="text-xs text-navy-900/60 mb-2">معارض طاكسيس للخدمة الكنسية</p>
-              <a href="tel:01220201204" className="text-sm font-bold text-burgundy-800 flex items-center justify-end gap-1">
-                01220201204
+              <p className="text-xs text-navy-900/60 mb-2">{isAr ? "معارض طاكسيس للخدمة الكنسية" : "Taxsis Showrooms for Liturgical Supplies"}</p>
+              <a href="tel:01220201204" className={`text-sm font-bold text-burgundy-800 flex items-center ${isAr ? "justify-end" : "justify-start"} gap-1`}>
+                <span>01220201204</span>
               </a>
             </div>
           </div>
