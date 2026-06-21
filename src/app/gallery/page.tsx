@@ -9,56 +9,7 @@ export default function ProjectGallery() {
   const isAr = language === "ar";
   const [filter, setFilter] = useState<"all" | "wood" | "vestment" | "vessels">("all");
 
-  const portfolioItems = [
-    { 
-      title_ar: "منجلية (حامل إنجيل) خشب أرو أحمر محفورة يدوياً", 
-      title_en: "Fully Hand-Carved Oak Bible Lectern (Mangaleya)", 
-      category: "wood", 
-      img: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=400&q=80" 
-    },
-    { 
-      title_ar: "تفصيل بدلة كهنوتية بيضاء مذهبة بالكامل بخيوط فرنسية", 
-      title_en: "Bespoke Royal White Vestment with Gold French Thread", 
-      category: "vestment", 
-      img: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80" 
-    },
-    { 
-      title_ar: "صياغة طقم أواني المذبح مذهبة بالذهب عيار ٢٤", 
-      title_en: "Liturgical Vessel Set Gilded in 24K Gold", 
-      category: "vessels", 
-      img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80" 
-    },
-    { 
-      title_ar: "شمع دانات نحاسية عملاقة منقوشة بالصلبان القبطية", 
-      title_en: "Giant Solid Brass Candelabras with Coptic Cross Engravings", 
-      category: "vessels", 
-      img: "https://images.unsplash.com/photo-1478147427282-58a87a120781?auto=format&fit=crop&w=400&q=80" 
-    },
-    { 
-      title_ar: "صليب يدوي من خشب الزيتون الطبيعي محفور بدقة", 
-      title_en: "Natural Olive Wood Hand Cross Finely Engraved", 
-      category: "wood", 
-      img: "https://images.unsplash.com/photo-1594897030264-ab7d87efc473?auto=format&fit=crop&w=400&q=80" 
-    },
-    { 
-      title_ar: "تفصيل بطرشيل قطيفة أحمر ملكي مطرز بصور القديسين والصلبان", 
-      title_en: "Royal Red Velvet Priest Stole (Batrashil) with Embroidered Saints", 
-      category: "vestment", 
-      img: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=400&q=80" 
-    },
-    { 
-      title_ar: "أغطية مذبح حرير طبيعي مطرزة بالخيوط اللامعة", 
-      title_en: "Natural Silk Altar Covers Embroidered with Shimmering Threads", 
-      category: "vestment", 
-      img: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=400&q=80" 
-    },
-    { 
-      title_ar: "علبة أواني كنسية مخصصة ومبطنة بالقطيفة الحمراء", 
-      title_en: "Bespoke Liturgical Vessels Storage Box Lined with Red Velvet", 
-      category: "wood", 
-      img: "https://images.unsplash.com/photo-1548625361-155de6c7f54d?auto=format&fit=crop&w=400&q=80" 
-    }
-  ];
+  const portfolioItems: { title_ar: string; title_en: string; category: string; img: string; }[] = [];
 
   const filteredItems = filter === "all" 
     ? portfolioItems 
@@ -132,33 +83,40 @@ export default function ProjectGallery() {
       </div>
 
       {/* Grid List */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredItems.map((item, idx) => (
-          <div 
-            key={idx} 
-            className="bg-white rounded-xl overflow-hidden border border-gold-500/10 shadow-sm hover:shadow-md transition-all group relative flex flex-col justify-between"
-          >
-            <div className="relative h-64 overflow-hidden border-b border-gold-500/5">
-              <img 
-                src={item.img} 
-                alt={isAr ? item.title_ar : item.title_en} 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-              />
-              <div className="absolute inset-0 bg-burgundy-900/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
-                <span className="bg-white/95 text-burgundy-800 font-extrabold px-4 py-2 rounded-lg text-xs flex items-center gap-1">
-                  <Eye className="w-4 h-4" />
-                  {dict.previewBtn}
-                </span>
+      {filteredItems.length === 0 ? (
+        <div className="text-center py-20 text-navy-900/40 text-sm font-semibold border-2 border-dashed border-gold-500/10 rounded-2xl bg-white max-w-xl mx-auto p-8 shadow-sm">
+          <Sparkles className="w-10 h-10 text-gold-500 mx-auto mb-3 animate-pulse" />
+          <p>{isAr ? "سيتم عرض نماذج من أعمالنا ومشاريعنا المنجزة هنا قريباً." : "Sample projects will be displayed here soon."}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {filteredItems.map((item, idx) => (
+            <div 
+              key={idx} 
+              className="bg-white rounded-xl overflow-hidden border border-gold-500/10 shadow-sm hover:shadow-md transition-all group relative flex flex-col justify-between"
+            >
+              <div className="relative h-64 overflow-hidden border-b border-gold-500/5">
+                <img 
+                  src={item.img} 
+                  alt={isAr ? item.title_ar : item.title_en} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                />
+                <div className="absolute inset-0 bg-burgundy-900/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                  <span className="bg-white/95 text-burgundy-800 font-extrabold px-4 py-2 rounded-lg text-xs flex items-center gap-1">
+                    <Eye className="w-4 h-4" />
+                    {dict.previewBtn}
+                  </span>
+                </div>
+              </div>
+              <div className="p-4">
+                <h4 className="font-bold text-xs md:text-sm text-navy-950 leading-relaxed text-center min-h-[40px] flex items-center justify-center">
+                  {isAr ? item.title_ar : item.title_en}
+                </h4>
               </div>
             </div>
-            <div className="p-4">
-              <h4 className="font-bold text-xs md:text-sm text-navy-950 leading-relaxed text-center min-h-[40px] flex items-center justify-center">
-                {isAr ? item.title_ar : item.title_en}
-              </h4>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
     </div>
   );

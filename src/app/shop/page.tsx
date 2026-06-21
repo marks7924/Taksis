@@ -374,7 +374,7 @@ function ShopCatalog() {
 
                          <button
                           onClick={() => {
-                            const isEngravingProduct = product.category_id === "cat-10" || product.id === "prod-laser-eng";
+                            const isEngravingProduct = product.name_ar.includes("حفر") || product.name_en.toLowerCase().includes("engrav") || product.category_id === "cat-10" || product.id === "prod-laser-eng";
                             if (isEngravingProduct) {
                               router.push(`/shop/${product.id}`);
                             } else {
