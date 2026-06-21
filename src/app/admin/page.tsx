@@ -47,6 +47,7 @@ export default function AdminDashboard() {
   const [formStock, setFormStock] = useState("");
   const [formDescAr, setFormDescAr] = useState("");
   const [formDescEn, setFormDescEn] = useState("");
+  const [formImages, setFormImages] = useState("");
   
   // Custom Quote state
   const [selectedCustomId, setSelectedCustomId] = useState<string | null>(null);
@@ -85,6 +86,7 @@ export default function AdminDashboard() {
     setFormStock("");
     setFormDescAr("");
     setFormDescEn("");
+    setFormImages("");
     setShowProductForm(true);
   };
 
@@ -99,12 +101,17 @@ export default function AdminDashboard() {
     setFormStock(String(p.stock_quantity));
     setFormDescAr(p.description_ar);
     setFormDescEn(p.description_en);
+    setFormImages(p.images ? p.images.join(", ") : "");
     setShowProductForm(true);
   };
 
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const parsedImages = formImages
+        ? formImages.split(",").map(img => img.trim()).filter(Boolean)
+        : ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80"];
+
       await saveProduct({
         id: formId,
         sku: formSku || undefined,
@@ -116,7 +123,7 @@ export default function AdminDashboard() {
         stock_quantity: Number(formStock),
         description_ar: formDescAr,
         description_en: formDescEn,
-        images: ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80"]
+        images: parsedImages
       });
       addNotification(formId ? "تم تعديل صنف المنتج بنجاح" : "تم إضافة صنف كنسي جديد بنجاح");
       setShowProductForm(false);
@@ -482,6 +489,19 @@ export default function AdminDashboard() {
                     className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
                     required
                   />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold">روابط الصور (رابط مباشر أو روابط تفصلها فواصل للصور المتعددة):</label>
+                  <input
+                    type="text"
+                    value={formImages}
+                    onChange={(e) => setFormImages(e.target.value)}
+                    placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                    className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none text-left"
+                    dir="ltr"
+                  />
+                  <p className="text-[10px] text-navy-900/40">يمكنك إدخال رابط أو عدة روابط صور مفصولة بفواصل لجعل المعرض متحركاً.</p>
                 </div>
 
                 <div className="flex gap-2 justify-end">

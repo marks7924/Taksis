@@ -334,7 +334,7 @@ function ShopCatalog() {
                           {hasDiscount && (
                             <span className="text-[10px] text-navy-900/40 line-through leading-none mb-1">{product.price} ج.م</span>
                           )}
-                          <span className="font-bold text-sm text-burgundy-800 leading-none">{displayPrice} ج.m</span>
+                          <span className="font-bold text-sm text-burgundy-800 leading-none">{displayPrice} ج.م</span>
                         </div>
 
                         <button
