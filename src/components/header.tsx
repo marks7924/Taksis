@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
@@ -26,12 +26,25 @@ export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
+  // Cart animation state
+  const [animateCart, setAnimateCart] = useState(false);
+  const [prevTotalItems, setPrevTotalItems] = useState(0);
+
   // Cart totals
   const cartSubtotal = cart.reduce((sum, item) => sum + (item.product.discount_price || item.product.price) * item.quantity, 0);
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const unreadNotifs = notifications.filter(n => !n.read).length;
 
   const isAr = language === "ar";
+
+  useEffect(() => {
+    if (totalItems > prevTotalItems) {
+      setAnimateCart(true);
+      const timer = setTimeout(() => setAnimateCart(false), 1000);
+      return () => clearTimeout(timer);
+    }
+    setPrevTotalItems(totalItems);
+  }, [totalItems, prevTotalItems]);
 
   // Simple category shortcuts
   const categoriesShort = isAr ? [
@@ -286,7 +299,9 @@ export default function Header() {
             {/* Shopping Cart Drawer Trigger */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="bg-gradient-to-r from-burgundy-800 to-burgundy-900 text-gold-300 px-3 py-2 rounded-full flex items-center gap-1.5 border border-gold-500/30 hover:scale-105 hover:border-gold-500/70 transition-all shadow-md cursor-pointer group"
+              className={`bg-gradient-to-r from-burgundy-800 to-burgundy-900 text-gold-300 px-3 py-2 rounded-full flex items-center gap-1.5 border border-gold-500/30 hover:scale-105 hover:border-gold-500/70 shadow-md cursor-pointer group transition-all duration-300 ${
+                animateCart ? "scale-110 rotate-3 animate-bounce shadow-[0_0_25px_rgba(212,175,55,0.9)] ring-4 ring-gold-400" : ""
+              }`}
               title={isAr ? "سلة المشتريات" : "Shopping Cart"}
             >
               <ShoppingBag className="w-4.5 h-4.5 group-hover:animate-pulse" />
@@ -298,18 +313,6 @@ export default function Header() {
               <span className="sm:hidden font-bold text-xs">{totalItems}</span>
             </button>
 
-          </div>
-        </div>
-
-        {/* Quick Categories Bar (Desktop) */}
-        <div className="hidden xl:block bg-ivory-200 border-t border-gold-500/5 py-2">
-          <div className="max-w-7xl mx-auto px-8 flex items-center justify-center gap-6 text-[11px] font-bold text-navy-800">
-            {categoriesShort.map((cat, idx) => (
-              <Link key={idx} href={cat.path} className="hover:text-burgundy-800 transition-all hover:scale-105 flex items-center gap-1.5 duration-200">
-                <span className="w-1 h-1 bg-gold-500 rounded-full"></span>
-                {cat.name}
-              </Link>
-            ))}
           </div>
         </div>
       </header>

@@ -72,7 +72,7 @@ export const CATEGORIES: Category[] = [
   { id: "cat-5", name_ar: "الشورية", name_en: "Shoria (Censer)", slug: "shoria", image_url: "/images/شوريه.jpg" },
   { id: "cat-6", name_ar: "أواني المذبح", name_en: "Liturgical Vessels", slug: "liturgical-vessels", image_url: "/images/اواني مذبح.jpg" },
   { id: "cat-7", name_ar: "كتب الكنيسة", name_en: "Church Liturgy Books", slug: "liturgical-books", image_url: "" },
-  { id: "cat-8", name_ar: "الصلبان", name_en: "Crosses", slug: "crosses", image_url: "" },
+  { id: "cat-8", name_ar: "الصلبان", name_en: "Crosses", slug: "crosses", image_url: "/images/صليب عاج (1).jpg" },
   { id: "cat-9", name_ar: "مستلزمات المذبح", name_en: "Altar Supplies", slug: "altar-supplies", image_url: "/images/فرش مذبج.jpg" },
   { id: "cat-10", name_ar: "الأعمال الخشبية والحفر", name_en: "Engraved Woodworks & Carving", slug: "engraved-woodworks", image_url: "/images/حفر كوستر خشب.jpg" },
   { id: "cat-11", name_ar: "منتجات أخرى", name_en: "Others", slug: "others", image_url: "" }
@@ -652,7 +652,7 @@ export const PRODUCTS: Product[] = [
     price: 500,
     category_id: "cat-8",
     stock_quantity: 15,
-    images: [],
+    images: ["/images/صليب عاج (1).jpg", "/images/صليب عاج (2).jpg"],
     specifications: {
       "الخامة": "عاج طبيعي"
     },
