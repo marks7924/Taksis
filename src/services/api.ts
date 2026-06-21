@@ -92,13 +92,39 @@ async function readDB(): Promise<Required<DatabaseState>> {
     try {
       const data = await fs.readFile(DB_FILE_PATH, "utf-8");
       const state = JSON.parse(data);
-      if (!state.coupons) {
-        state.coupons = INITIAL_COUPONS;
-        await fs.writeFile(DB_FILE_PATH, JSON.stringify(state, null, 2), "utf-8");
+      
+      // Merge defaults if keys are missing from older database snapshots
+      let modified = false;
+      if (!state.products) { state.products = PRODUCTS; modified = true; }
+      if (!state.categories) { state.categories = CATEGORIES; modified = true; }
+      if (!state.branches) { state.branches = BRANCHES; modified = true; }
+      if (!state.orders) { state.orders = []; modified = true; }
+      if (!state.customRequests) { state.customRequests = []; modified = true; }
+      if (!state.users) {
+        state.users = [
+          {
+            id: "admin-id",
+            fullName: "المدير العام طاكسيس",
+            email: "taksisdaf@gmail.com",
+            role: "admin",
+            phone: "01220201204"
+          }
+        ];
+        modified = true;
+      }
+      if (!state.coupons) { state.coupons = INITIAL_COUPONS; modified = true; }
+      
+      if (modified) {
+        try {
+          await fs.writeFile(DB_FILE_PATH, JSON.stringify(state, null, 2), "utf-8");
+        } catch (wErr) {
+          console.warn("Failed to write updated config, falling back to in-memory only", wErr);
+          inMemoryDb = state as Required<DatabaseState>;
+        }
       }
       return state as Required<DatabaseState>;
     } catch (e) {
-      // File doesn't exist, create it with seed data
+      // File doesn't exist or is invalid JSON, create it with seed data
       const initialState: Required<DatabaseState> = {
         products: PRODUCTS,
         categories: CATEGORIES,
@@ -119,7 +145,7 @@ async function readDB(): Promise<Required<DatabaseState>> {
       try {
         await fs.writeFile(DB_FILE_PATH, JSON.stringify(initialState, null, 2), "utf-8");
       } catch (writeErr) {
-        console.warn("Write to DB failed, falling back to in-memory", writeErr);
+        console.warn("Write to DB failed on initialization, using memory cache", writeErr);
         inMemoryDb = initialState;
       }
       return initialState;
@@ -152,19 +178,18 @@ async function readDB(): Promise<Required<DatabaseState>> {
 async function writeDB(state: DatabaseState): Promise<boolean> {
   if (inMemoryDb) {
     inMemoryDb = state as Required<DatabaseState>;
+    return true; // Bypass file write if we are already in-memory fallback mode
   }
   try {
     await fs.mkdir(path.dirname(DB_FILE_PATH), { recursive: true });
     await fs.writeFile(DB_FILE_PATH, JSON.stringify(state, null, 2), "utf-8");
     return true;
   } catch (err) {
-    console.error("Failed to write to JSON DB, using in-memory updates", err);
-    // Set cache so future calls reuse this updated state
+    console.error("Failed to write to JSON DB, activating memory cache mode", err);
     inMemoryDb = state as Required<DatabaseState>;
     return true;
   }
 }
-
 // =================== CATEGORIES ===================
 export async function getCategories(): Promise<Category[]> {
   const db = await readDB();
