@@ -71,28 +71,55 @@ export interface DatabaseState {
   coupons?: Coupon[];
 }
 
-// In-memory fallback cache to prevent 500 errors in read-only filesystems (e.g. Vercel)
+// In-memory database cache
 let inMemoryDb: Required<DatabaseState> | null = null;
 
-// Determine DB File Path
-// In Serverless/Vercel environments, we must write to '/tmp' as it is the only writeable directory.
 const IS_SERVERLESS = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
-const DB_FILE_PATH = IS_SERVERLESS 
-  ? path.join("/tmp", "taksis-db.json") 
-  : path.join(process.cwd(), "src", "services", "db.json");
+const DB_FILE_PATH = path.join(process.cwd(), "src", "services", "db.json");
 
+// Helper to get initial state cloned
+function getInitialState(): Required<DatabaseState> {
+  return {
+    products: [...PRODUCTS],
+    categories: [...CATEGORIES],
+    branches: [...BRANCHES],
+    orders: [],
+    customRequests: [],
+    users: [
+      {
+        id: "admin-id",
+        fullName: "المدير العام طاكسيس",
+        email: "taksisdaf@gmail.com",
+        role: "admin",
+        phone: "01220201204"
+      }
+    ],
+    coupons: [...INITIAL_COUPONS]
+  };
+}
+
+// Read database file
 async function readDB(): Promise<Required<DatabaseState>> {
+  // If running in serverless production (Vercel), bypass filesystem read/writes entirely
+  if (IS_SERVERLESS) {
+    if (!inMemoryDb) {
+      inMemoryDb = getInitialState();
+    }
+    return inMemoryDb;
+  }
+
+  // Local development filesystem read
   if (inMemoryDb) {
     return inMemoryDb;
   }
+
   try {
-    // Attempt directory creation
     await fs.mkdir(path.dirname(DB_FILE_PATH), { recursive: true });
     try {
       const data = await fs.readFile(DB_FILE_PATH, "utf-8");
       const state = JSON.parse(data);
       
-      // Merge defaults if keys are missing or empty from older database snapshots
+      // Merge defaults if keys are missing or empty
       let modified = false;
       if (!state.products || state.products.length === 0) { state.products = [...PRODUCTS]; modified = true; }
       if (!state.categories || state.categories.length === 0) { state.categories = [...CATEGORIES]; modified = true; }
@@ -113,7 +140,6 @@ async function readDB(): Promise<Required<DatabaseState>> {
       }
       if (!state.coupons || state.coupons.length === 0) { state.coupons = [...INITIAL_COUPONS]; modified = true; }
       
-      // Make sure all arrays are clones to avoid "object is not extensible" freezes in Serverless runtime
       state.products = [...state.products];
       state.categories = [...state.categories];
       state.branches = [...state.branches];
@@ -126,76 +152,41 @@ async function readDB(): Promise<Required<DatabaseState>> {
         try {
           await fs.writeFile(DB_FILE_PATH, JSON.stringify(state, null, 2), "utf-8");
         } catch (wErr) {
-          console.warn("Failed to write updated config, falling back to in-memory only", wErr);
-          inMemoryDb = state as Required<DatabaseState>;
+          console.warn("Failed to write updated DB file locally", wErr);
         }
       }
       return state as Required<DatabaseState>;
     } catch (e) {
-      // File doesn't exist or is invalid JSON, create it with seed data
-      const initialState: Required<DatabaseState> = {
-        products: [...PRODUCTS],
-        categories: [...CATEGORIES],
-        branches: [...BRANCHES],
-        orders: [],
-        customRequests: [],
-        users: [
-          {
-            id: "admin-id",
-            fullName: "المدير العام طاكسيس",
-            email: "taksisdaf@gmail.com",
-            role: "admin",
-            phone: "01220201204"
-          }
-        ],
-        coupons: [...INITIAL_COUPONS]
-      };
+      const initialState = getInitialState();
       try {
         await fs.writeFile(DB_FILE_PATH, JSON.stringify(initialState, null, 2), "utf-8");
       } catch (writeErr) {
-        console.warn("Write to DB failed on initialization, using memory cache", writeErr);
-        inMemoryDb = initialState;
+        console.warn("Failed to initialize DB file locally", writeErr);
       }
       return initialState;
     }
   } catch (err) {
-    console.error("Failed to read JSON DB, falling back to static in-memory state", err);
-    const fallbackState: Required<DatabaseState> = {
-      products: [...PRODUCTS],
-      categories: [...CATEGORIES],
-      branches: [...BRANCHES],
-      orders: [],
-      customRequests: [],
-      users: [
-        {
-          id: "admin-id",
-          fullName: "المدير العام طاكسيس",
-          email: "taksisdaf@gmail.com",
-          role: "admin",
-          phone: "01220201204"
-        }
-      ],
-      coupons: [...INITIAL_COUPONS]
-    };
-    inMemoryDb = fallbackState;
-    return fallbackState;
+    console.error("Local DB read failed, falling back to memory state", err);
+    inMemoryDb = getInitialState();
+    return inMemoryDb;
   }
 }
 
-
 // Write database file
 async function writeDB(state: DatabaseState): Promise<boolean> {
-  if (inMemoryDb) {
-    inMemoryDb = state as Required<DatabaseState>;
-    return true; // Bypass file write if we are already in-memory fallback mode
+  // Always update memory state
+  inMemoryDb = state as Required<DatabaseState>;
+  
+  if (IS_SERVERLESS) {
+    return true; // Bypass filesystem writes in serverless production
   }
+
   try {
     await fs.mkdir(path.dirname(DB_FILE_PATH), { recursive: true });
     await fs.writeFile(DB_FILE_PATH, JSON.stringify(state, null, 2), "utf-8");
     return true;
   } catch (err) {
-    console.error("Failed to write to JSON DB, activating memory cache mode", err);
-    inMemoryDb = state as Required<DatabaseState>;
+    console.error("Local DB write failed", err);
     return true;
   }
 }
