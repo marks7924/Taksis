@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Sparkles, Phone, MapPin, Clock, ArrowRight, Heart, ShoppingBag, 
-  Map, Check, ChevronDown, Quote, HelpCircle, Award
+  Map, Check, ChevronDown, Quote, HelpCircle, Award, Scissors, Hammer
 } from "lucide-react";
 import { useApp } from "@/services/store";
 import { BRANCHES, TESTIMONIALS, FAQS, Product, Category, Branch } from "@/services/db-mock-data";
@@ -103,21 +103,18 @@ export default function Home() {
     {
       title: "طاكسيس للشماس والقسيس",
       subtitle: "مستلزمات كنسية فاخرة تصنع يدوياً بالطلب الخاص لتلائم جلال ووقار المذبح المقدس",
-      bgImage: "https://images.unsplash.com/photo-1548625361-155de6c7f54d?auto=format&fit=crop&w=1200&q=80",
       ctaText: "تصفح المتجر الكامل",
       ctaLink: "/shop"
     },
     {
       title: "ملابس الكهنوت والأردية الشماسية",
       subtitle: "تفصيل البرانس، والبطراشيل، والطونيات بأجود الأقمشة والحرير السوري والكنارات المذهبة",
-      bgImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
       ctaText: "تفصيل ملابس خدمة مخصصة",
       ctaLink: "/custom-orders"
     },
     {
       title: "الدفوف والصنوج النحاسية المصمتة",
       subtitle: "صياغة نحاسية يدوية دقيقة ورائعة لخدمة ألحان الكنيسة القبطية الأرثوذكسية والتسبحة",
-      bgImage: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80",
       ctaText: "استكشف الدفوف الكنسية",
       ctaLink: "/shop?category=cat-1"
     }
@@ -125,21 +122,18 @@ export default function Home() {
     {
       title: "Taksis for Deacon & Priest",
       subtitle: "Premium bespoke church supplies handcrafted to order, preserving the solemnity of the holy altar.",
-      bgImage: "https://images.unsplash.com/photo-1548625361-155de6c7f54d?auto=format&fit=crop&w=1200&q=80",
       ctaText: "Browse Full Shop",
       ctaLink: "/shop"
     },
     {
       title: "Clergy Vestments & Deacon Tonias",
       subtitle: "Custom tailoring of stoles (batrashil), sticharia (tonia), and phelonions using premium Syrian silk.",
-      bgImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
       ctaText: "Order Custom Vestments",
       ctaLink: "/custom-orders"
     },
     {
       title: "Handcrafted Cymbals & Solid Brass Dafs",
       subtitle: "Meticulously hand-forged brass instruments tuned for Coptic Orthodox liturgical hymns and praises.",
-      bgImage: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80",
       ctaText: "Explore Liturgical Dafs",
       ctaLink: "/shop?category=cat-1"
     }
@@ -191,22 +185,22 @@ export default function Home() {
   const newArrivals = products.filter(p => p.is_new_arrival).slice(0, 4);
 
   const completedProjects = isAr ? [
-    { title: "حامل إنجيل (منجلية) خشبي أرو محفور بالكامل", img: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=400&q=80" },
-    { title: "تفصيل برنص كهنوتي ملكي مذهب يدوي", img: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80" },
-    { title: "صياغة طقم أواني كنسية فضة خالصة مطلية ذهب", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80" },
-    { title: "شمع دانات نحاسية عملاقة لمذبح كنيسة مارمينا", img: "https://images.unsplash.com/photo-1478147427282-58a87a120781?auto=format&fit=crop&w=400&q=80" }
+    { title: "حامل إنجيل (منجلية) خشبي أرو محفور بالكامل", type: "wood" },
+    { title: "تفصيل برنص كهنوتي ملكي مذهب يدوي", type: "tailor" },
+    { title: "صياغة طقم أواني كنسية فضة خالصة مطلية ذهب", type: "metal" },
+    { title: "شمع دانات نحاسية عملاقة لمذبح كنيسة مارمينا", type: "brass" }
   ] : [
-    { title: "Fully Hand-Carved Oak Bible Lectern (Mangaleya)", img: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=400&q=80" },
-    { title: "Bespoke Royal Phelonion with Hand-Embroidered Gold Accents", img: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80" },
-    { title: "Hand-forged Altar Vessel Set in Pure Gilded Silver", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80" },
-    { title: "Giant Solid Brass Candlesticks for St. Mina Church Altar", img: "https://images.unsplash.com/photo-1478147427282-58a87a120781?auto=format&fit=crop&w=400&q=80" }
+    { title: "Fully Hand-Carved Oak Bible Lectern (Mangaleya)", type: "wood" },
+    { title: "Bespoke Royal Phelonion with Hand-Embroidered Gold Accents", type: "tailor" },
+    { title: "Hand-forged Altar Vessel Set in Pure Gilded Silver", type: "metal" },
+    { title: "Giant Solid Brass Candlesticks for St. Mina Church Altar", type: "brass" }
   ];
 
   return (
     <div className="space-y-20 pb-20">
       
       {/* 1. HERO SLIDESHOW BANNER */}
-      <section className="relative h-[500px] md:h-[650px] overflow-hidden bg-burgundy-900">
+      <section className="relative h-[500px] md:h-[650px] overflow-hidden bg-burgundy-950">
         {heroSlides.map((slide, index) => (
           <div
             key={index}
@@ -214,11 +208,12 @@ export default function Home() {
               index === activeSlide ? "opacity-100 z-10" : "opacity-0 z-0"
             }`}
           >
-            <div 
-              className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-30"
-              style={{ backgroundImage: `url(${slide.bgImage})` }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-transparent to-black/40" />
+            {/* Rich CSS Gradient instead of photographic background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-burgundy-950 via-burgundy-900 to-navy-950" />
+            
+            {/* Subtle premium abstract glowing patterns */}
+            <div className="absolute top-1/4 left-1/4 w-72 md:w-96 h-72 md:h-96 bg-gold-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-1/4 right-1/4 w-72 md:w-96 h-72 md:h-96 bg-burgundy-800/20 rounded-full blur-3xl pointer-events-none" />
 
             <div className="absolute inset-0 flex items-center justify-center text-center p-6">
               <div className="max-w-4xl space-y-6 animate-fade-in-up">
@@ -706,15 +701,42 @@ export default function Home() {
         </div>
 
         {/* Grid portfolio */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {completedProjects.map((item, idx) => (
-            <div key={idx} className="relative rounded-xl overflow-hidden group shadow-sm h-64 border border-gold-500/10">
-              <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-burgundy-900/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                <p className={`text-white font-bold text-xs md:text-sm leading-relaxed ${isAr ? "text-right" : "text-left"}`}>{item.title}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {completedProjects.map((item, idx) => {
+            const IconComponent = 
+              item.type === "wood" ? Hammer : 
+              item.type === "tailor" ? Scissors : 
+              item.type === "metal" ? Award : Sparkles;
+              
+            return (
+              <div 
+                key={idx} 
+                className="relative rounded-2xl overflow-hidden group shadow-md h-64 border border-gold-500/20 bg-gradient-to-b from-burgundy-950 to-burgundy-900 p-6 flex flex-col justify-between transition-all duration-300 hover:border-gold-500/50 hover:shadow-gold-500/5 hover:-translate-y-1"
+              >
+                {/* Decorative Coptic Border Corner Accents */}
+                <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-gold-500/30" />
+                <div className="absolute top-2 right-2 w-4 h-4 border-t border-r border-gold-500/30" />
+                <div className="absolute bottom-2 left-2 w-4 h-4 border-b border-l border-gold-500/30" />
+                <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-gold-500/30" />
+
+                {/* Subtle overlay glow */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(212,175,55,0.05),_transparent_70%)] pointer-events-none" />
+
+                <div className="flex justify-start pt-2">
+                  <div className="p-3 rounded-xl bg-gold-500/10 border border-gold-500/20 group-hover:scale-110 transition-transform duration-300">
+                    <IconComponent className="w-6 h-6 text-gold-400" />
+                  </div>
+                </div>
+
+                <div className={`space-y-2 relative z-10 ${isAr ? "text-right" : "text-left"}`}>
+                  <div className="w-8 h-0.5 bg-gold-500/50 group-hover:w-12 transition-all duration-300" />
+                  <p className="text-ivory-100 font-serif font-bold text-sm md:text-base leading-relaxed group-hover:text-gold-300 transition-colors">
+                    {item.title}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="text-center mt-8">
           <Link href="/gallery" className="inline-block bg-white hover:bg-gold-500/10 text-burgundy-800 font-bold border-2 border-gold-500/30 px-8 py-3 rounded-lg text-xs transition-colors">
