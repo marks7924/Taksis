@@ -6,6 +6,7 @@ import {
   ShoppingBag, X, Plus, Minus, ArrowLeft, ShieldCheck, Tag 
 } from "lucide-react";
 import { useApp } from "@/services/store";
+import { validateCoupon } from "@/services/api";
 
 export default function Cart() {
   const { cart, updateCartQuantity, removeFromCart, clearCart, language } = useApp();
@@ -13,6 +14,7 @@ export default function Cart() {
   // Coupon state
   const [couponCode, setCouponCode] = useState("");
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [fixedDiscount, setFixedDiscount] = useState(0);
   const [couponMsg, setCouponMsg] = useState("");
   const [governorate, setGovernorate] = useState("cairo");
 
@@ -22,30 +24,42 @@ export default function Cart() {
   const subtotal = cart.reduce((sum, item) => sum + (item.product.discount_price || item.product.price) * item.quantity, 0);
   
   // Apply coupon
-  const handleApplyCoupon = (e: React.FormEvent) => {
+  const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = couponCode.trim().toUpperCase();
-    if (code === "TAXSIS10") {
-      setDiscountPercent(10);
-      setCouponMsg(
-        isAr 
-          ? "تم تطبيق الكود بنجاح! خصم ١٠٪ على جميع المشتريات."
-          : "Coupon applied successfully! 10% off all purchases."
-      );
-    } else if (code === "COPTIC15") {
-      setDiscountPercent(15);
-      setCouponMsg(
-        isAr
-          ? "كود بركة الأعياد مفعّل! خصم ١٥٪ على السلة."
-          : "Feast blessings coupon active! 15% off cart."
-      );
-    } else {
-      setDiscountPercent(0);
-      setCouponMsg(
-        isAr
-          ? "كود الخصم غير صحيح أو منتهي الصلاحية."
-          : "Invalid or expired coupon code."
-      );
+    if (!code) return;
+    
+    try {
+      const coupon = await validateCoupon(code);
+      if (coupon) {
+        if (coupon.discount_type === "percentage") {
+          setDiscountPercent(coupon.discount_value);
+          setFixedDiscount(0);
+          setCouponMsg(
+            isAr 
+              ? `تم تطبيق الكود بنجاح! خصم ${coupon.discount_value}٪ على السلة.`
+              : `Coupon applied successfully! ${coupon.discount_value}% off all purchases.`
+          );
+        } else {
+          setFixedDiscount(coupon.discount_value);
+          setDiscountPercent(0);
+          setCouponMsg(
+            isAr 
+              ? `تم تطبيق الكود بنجاح! خصم بقيمة ${coupon.discount_value} ج.م على السلة.`
+              : `Coupon applied successfully! EGP ${coupon.discount_value} off all purchases.`
+          );
+        }
+      } else {
+        setDiscountPercent(0);
+        setFixedDiscount(0);
+        setCouponMsg(
+          isAr
+            ? "كوبون الخصم غير صحيح، أو انتهت فترة صلاحيته."
+            : "Invalid or expired coupon code."
+        );
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -56,7 +70,7 @@ export default function Cart() {
     return 100;
   };
 
-  const discountAmount = Math.round((subtotal * discountPercent) / 100);
+  const discountAmount = fixedDiscount > 0 ? fixedDiscount : Math.round((subtotal * discountPercent) / 100);
   const shippingCost = cart.length > 0 ? getShippingCost() : 0;
   const taxAmount = Math.round((subtotal - discountAmount) * 0.14); // 14% VAT Egypt
   const total = subtotal - discountAmount + shippingCost + taxAmount;
@@ -300,7 +314,7 @@ export default function Cart() {
               </div>
 
               <Link
-                href={`/checkout?coupon=${discountPercent > 0 ? couponCode : ""}&gov=${governorate}`}
+                href={`/checkout?coupon=${(discountPercent > 0 || fixedDiscount > 0) ? couponCode : ""}&gov=${governorate}`}
                 className="w-full bg-burgundy-800 hover:bg-burgundy-900 text-gold-300 font-extrabold py-3.5 rounded-xl border border-gold-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-burgundy-900/10 hover:scale-[1.02] text-sm text-center"
               >
                 <span>{dict.checkoutBtn}</span>

@@ -7,7 +7,7 @@ import {
   ShieldCheck, Printer, CheckCircle2, Copy, MapPin, Phone, Mail, ShoppingBag, CreditCard, Info
 } from "lucide-react";
 import { useApp } from "@/services/store";
-import { createOrder, Order } from "@/services/api";
+import { createOrder, Order, validateCoupon } from "@/services/api";
 
 function CheckoutForm() {
   const searchParams = useSearchParams();
@@ -38,6 +38,10 @@ function CheckoutForm() {
   const [loading, setLoading] = useState(false);
   const [createdOrder, setCreatedOrder] = useState<Order | null>(null);
   const [copiedTracking, setCopiedTracking] = useState(false);
+  
+  // Coupon states
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [fixedDiscount, setFixedDiscount] = useState(0);
 
   // Auto-sync if currentUser updates
   useEffect(() => {
@@ -59,11 +63,32 @@ function CheckoutForm() {
     }
   }, [cart, createdOrder, router]);
 
+  // Dynamically validate coupon code if present in URL
+  useEffect(() => {
+    async function loadCoupon() {
+      if (!paramCoupon) return;
+      try {
+        const coupon = await validateCoupon(paramCoupon);
+        if (coupon) {
+          if (coupon.discount_type === "percentage") {
+            setDiscountPercent(coupon.discount_value);
+            setFixedDiscount(0);
+          } else {
+            setFixedDiscount(coupon.discount_value);
+            setDiscountPercent(0);
+          }
+        }
+      } catch (err) {
+        console.error("Error validating coupon at checkout", err);
+      }
+    }
+    loadCoupon();
+  }, [paramCoupon]);
+
   // Calculations
   const subtotal = cart.reduce((sum, item) => sum + (item.product.discount_price || item.product.price) * item.quantity, 0);
   
-  const discountPercent = paramCoupon === "TAXSIS10" ? 10 : paramCoupon === "COPTIC15" ? 15 : 0;
-  const discountAmount = Math.round((subtotal * discountPercent) / 100);
+  const discountAmount = fixedDiscount > 0 ? fixedDiscount : Math.round((subtotal * discountPercent) / 100);
   
   const getShippingCost = () => {
     if (governorate === "cairo" || governorate === "giza") return 50;

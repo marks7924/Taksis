@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { 
   LayoutDashboard, ShoppingCart, Package, Settings, Users, FileText,
   TrendingUp, AlertCircle, Plus, Edit3, Trash2, CheckCircle2, ChevronDown, 
-  Search, ShieldAlert, Sparkles, MessageCircle, DollarSign
+  Search, ShieldAlert, Sparkles, MessageCircle, DollarSign, Tag, RotateCcw
 } from "lucide-react";
 import { useApp } from "@/services/store";
 import { 
@@ -13,7 +13,8 @@ import {
   getOrders, updateOrderStatus, 
   getCustomRequests, updateCustomRequestStatus,
   getCategories, saveCategory, deleteCategory,
-  Order, CustomRequest
+  getCoupons, saveCoupon, deleteCoupon, resetDatabase,
+  Order, CustomRequest, Coupon
 } from "@/services/api";
 import { Product, Category } from "@/services/db-mock-data";
 
@@ -29,14 +30,25 @@ export default function AdminDashboard() {
   }, [currentUser]);
 
   // Tab state
-  const [activeTab, setActiveTab] = useState<"overview" | "products" | "categories" | "orders" | "customs" | "settings">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "products" | "categories" | "orders" | "customs" | "coupons" | "settings">("overview");
 
   // Database Data States
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [customs, setCustoms] = useState<CustomRequest[]>([]);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Form States for coupons
+  const [showCouponForm, setShowCouponForm] = useState(false);
+  const [coupFormId, setCoupFormId] = useState<string | undefined>(undefined);
+  const [coupFormCode, setCoupFormCode] = useState("");
+  const [coupFormDiscountType, setCoupFormDiscountType] = useState<"percentage" | "fixed">("percentage");
+  const [coupFormDiscountValue, setCoupFormDiscountValue] = useState("");
+  const [coupFormStartDate, setCoupFormStartDate] = useState("");
+  const [coupFormEndDate, setCoupFormEndDate] = useState("");
+  const [coupFormIsActive, setCoupFormIsActive] = useState(true);
 
   // Form States for categories
   const [showCategoryForm, setShowCategoryForm] = useState(false);
@@ -72,10 +84,12 @@ export default function AdminDashboard() {
       const o = await getOrders();
       const c = await getCustomRequests();
       const cats = await getCategories();
+      const coups = await getCoupons();
       setProducts(p);
       setCategories(cats);
       setOrders(o);
       setCustoms(c);
+      setCoupons(coups);
     } catch (err) {
       console.error("Failed to load admin db", err);
     } finally {
@@ -211,6 +225,82 @@ export default function AdminDashboard() {
     }
   };
 
+  // Coupon handlers
+  const handleOpenAddCoupon = () => {
+    setCoupFormId(undefined);
+    setCoupFormCode("");
+    setCoupFormDiscountType("percentage");
+    setCoupFormDiscountValue("");
+    setCoupFormStartDate("");
+    setCoupFormEndDate("");
+    setCoupFormIsActive(true);
+    setShowCouponForm(true);
+  };
+
+  const handleOpenEditCoupon = (c: Coupon) => {
+    setCoupFormId(c.id);
+    setCoupFormCode(c.code);
+    setCoupFormDiscountType(c.discount_type);
+    setCoupFormDiscountValue(String(c.discount_value));
+    setCoupFormStartDate(c.start_date || "");
+    setCoupFormEndDate(c.end_date || "");
+    setCoupFormIsActive(c.is_active);
+    setShowCouponForm(true);
+  };
+
+  const handleCouponSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await saveCoupon({
+        id: coupFormId,
+        code: coupFormCode,
+        discount_type: coupFormDiscountType,
+        discount_value: Number(coupFormDiscountValue),
+        start_date: coupFormStartDate || undefined,
+        end_date: coupFormEndDate || undefined,
+        is_active: coupFormIsActive
+      });
+      addNotification(coupFormId ? "تم تعديل الكوبون بنجاح" : "تم إضافة كوبون خصم جديد بنجاح");
+      setShowCouponForm(false);
+      await loadDatabase();
+    } catch (err) {
+      console.error(err);
+      alert("حدث خطأ أثناء حفظ الكوبون");
+    }
+  };
+
+  const handleDeleteCoupon = async (id: string) => {
+    if (!confirm("هل أنت متأكد من حذف هذا الكوبون نهائياً؟")) return;
+    try {
+      await deleteCoupon(id);
+      addNotification("تم حذف الكوبون بنجاح");
+      await loadDatabase();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Database Reset Handler
+  const handleResetDatabase = async () => {
+    if (!confirm("تحذير: هل أنت متأكد من إعادة تعيين قاعدة البيانات؟ سيؤدي ذلك لمسح جميع الطلبات والكوبونات والمنتجات المخصصة الحالية وإعادتها للحالة المصنعية.")) return;
+    try {
+      setLoading(true);
+      const ok = await resetDatabase();
+      if (ok) {
+        addNotification("تم إعادة تعيين قاعدة البيانات بنجاح!");
+        await loadDatabase();
+        await refreshData();
+      } else {
+        alert("حدث خطأ أثناء إعادة تعيين قاعدة البيانات");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("فشل تعيين قاعدة البيانات");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Order status actions handlers
   const handleUpdateOrderStatus = async (orderId: string, status: Order["status"], payStatus?: Order["payment_status"]) => {
     try {
@@ -253,6 +343,8 @@ export default function AdminDashboard() {
     tabProducts: isAr ? "المخزون والمنتجات" : "Products & Stock",
     tabCategories: isAr ? "الأقسام والكاتيجوريز" : "Liturgical Categories",
     tabOrders: isAr ? "الطلبات والمبيعات" : "Orders & Sales",
+    tabCoupons: isAr ? "كوبونات الخصم" : "Discount Coupons",
+    tabSettings: isAr ? "إعادة تعيين البيانات" : "Database Tools",
     tabCustoms: isAr ? "طلبات التفصيل المخصصة" : "Bespoke Requests",
     metricSales: isAr ? "إجمالي المبيعات المكتملة" : "Total Completed Sales",
     metricPending: isAr ? "الطلبات قيد المراجعة" : "Orders Pending Review",
@@ -420,6 +512,25 @@ export default function AdminDashboard() {
               {openCustomsCount}
             </span>
           )}
+        </button>
+        <button
+          onClick={() => setActiveTab("coupons")}
+          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${isAr ? "flex-row" : "flex-row-reverse"} ${
+            activeTab === "coupons" ? "bg-burgundy-800 text-gold-300 shadow" : "text-navy-800 hover:bg-gold-500/10"
+          }`}
+        >
+          <Tag className="w-4.5 h-4.5" />
+          <span>{dict.tabCoupons} ({coupons.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("settings")}
+          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${isAr ? "flex-row" : "flex-row-reverse"} ${
+            activeTab === "settings" ? "bg-burgundy-800 text-gold-300 shadow" : "text-navy-800 hover:bg-gold-500/10"
+          }`}
+        >
+          <RotateCcw className="w-4.5 h-4.5" />
+          <span>{dict.tabSettings}</span>
         </button>
       </div>
 
@@ -1031,6 +1142,239 @@ export default function AdminDashboard() {
                 </div>
               ))
             )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 5: COUPONS CRUD MANAGEMENT */}
+      {activeTab === "coupons" && (
+        <div className="space-y-6 animate-fade-in text-xs text-navy-950">
+          <div className={`flex justify-between items-center ${isAr ? "" : "flex-row-reverse"}`}>
+            <h3 className="font-serif text-base font-bold text-burgundy-800">
+              {isAr ? "إدارة كوبونات الخصم" : "Manage Discount Coupons"}
+            </h3>
+            <button
+              onClick={handleOpenAddCoupon}
+              className="bg-gold-500 hover:bg-gold-600 text-burgundy-900 font-extrabold px-4 py-2.5 rounded-lg text-xs border border-gold-400 cursor-pointer flex items-center gap-1"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{isAr ? "إضافة كوبون جديد" : "Add New Coupon"}</span>
+            </button>
+          </div>
+
+          {/* Coupon form toggle dialog inline */}
+          {showCouponForm && (
+            <div className="bg-ivory-200 border-2 border-gold-500/25 p-6 rounded-2xl shadow-lg animate-fade-in text-xs text-navy-950">
+              <form onSubmit={handleCouponSubmit} className={`space-y-6 ${isAr ? "text-right" : "text-left"}`}>
+                <h4 className="font-serif text-sm font-bold text-burgundy-800 border-b border-gold-500/10 pb-2 mb-4">
+                  {coupFormId ? (isAr ? "تعديل بيانات الكوبون" : "Edit Coupon Details") : (isAr ? "إضافة كوبون خصم جديد" : "Add New Promo Coupon")}
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                  <div className="space-y-1">
+                    <label className="font-bold block">{isAr ? "رمز الكوبون:" : "Coupon Code:"}</label>
+                    <input
+                      type="text"
+                      value={coupFormCode}
+                      onChange={(e) => setCoupFormCode(e.target.value.toUpperCase().trim())}
+                      placeholder="TAXSIS20"
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none text-left font-mono font-bold"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold block">{isAr ? "نوع الخصم:" : "Discount Type:"}</label>
+                    <select
+                      value={coupFormDiscountType}
+                      onChange={(e) => setCoupFormDiscountType(e.target.value as "percentage" | "fixed")}
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none font-bold"
+                    >
+                      <option value="percentage">{isAr ? "نسبة مئوية (%)" : "Percentage (%)"}</option>
+                      <option value="fixed">{isAr ? "مبلغ ثابت (ج.م)" : "Fixed Amount (EGP)"}</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold block">
+                      {coupFormDiscountType === "percentage" 
+                        ? (isAr ? "نسبة الخصم (%):" : "Discount Percentage (%):") 
+                        : (isAr ? "قيمة الخصم (ج.م):" : "Discount Value (EGP):")}
+                    </label>
+                    <input
+                      type="number"
+                      value={coupFormDiscountValue}
+                      onChange={(e) => setCoupFormDiscountValue(e.target.value)}
+                      placeholder="15"
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold block">{isAr ? "تاريخ بدء الصلاحية (اختياري):" : "Start Date (Optional):"}</label>
+                    <input
+                      type="date"
+                      value={coupFormStartDate}
+                      onChange={(e) => setCoupFormStartDate(e.target.value)}
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold block">{isAr ? "تاريخ انتهاء الصلاحية (اختياري):" : "End Date (Optional):"}</label>
+                    <input
+                      type="date"
+                      value={coupFormEndDate}
+                      onChange={(e) => setCoupFormEndDate(e.target.value)}
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1 flex items-center pt-5 gap-2">
+                    <input
+                      type="checkbox"
+                      id="coupFormIsActive"
+                      checked={coupFormIsActive}
+                      onChange={(e) => setCoupFormIsActive(e.target.checked)}
+                      className="w-4 h-4 accent-burgundy-800"
+                    />
+                    <label htmlFor="coupFormIsActive" className="font-bold cursor-pointer">
+                      {isAr ? "الكوبون نشط حالياً للعملاء" : "Coupon is Active for Customers"}
+                    </label>
+                  </div>
+                </div>
+
+                <div className={`flex gap-2 ${isAr ? "justify-end" : "justify-start"}`}>
+                  <button
+                    type="button"
+                    onClick={() => setShowCouponForm(false)}
+                    className="bg-white border rounded px-4 py-2 cursor-pointer"
+                  >
+                    {isAr ? "إلغاء" : "Cancel"}
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-burgundy-800 text-gold-300 font-bold px-6 py-2 rounded border border-gold-500/20 cursor-pointer"
+                  >
+                    {isAr ? "حفظ الكوبون" : "Save Coupon"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Coupons Table */}
+          <div className="bg-white rounded-2xl border border-gold-500/10 overflow-hidden shadow-sm">
+            <table className={`w-full text-xs ${isAr ? "text-right" : "text-left"}`}>
+              <thead className="bg-ivory-200 border-b border-gold-500/10 font-bold text-navy-950">
+                <tr>
+                  <th className="p-3">{isAr ? "رمز الكوبون" : "Coupon Code"}</th>
+                  <th className="p-3">{isAr ? "نوع الخصم" : "Discount Type"}</th>
+                  <th className="p-3 text-center">{isAr ? "القيمة" : "Value"}</th>
+                  <th className="p-3">{isAr ? "صلاحية البداية" : "Start Date"}</th>
+                  <th className="p-3">{isAr ? "صلاحية الانتهاء" : "End Date"}</th>
+                  <th className="p-3 text-center">{isAr ? "الحالة" : "Status"}</th>
+                  <th className={`p-3 ${isAr ? "text-left" : "text-right"}`}>{isAr ? "التحكم" : "Action"}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gold-500/5 font-semibold text-navy-900/80">
+                {coupons.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="p-8 text-center text-navy-900/40">
+                      {isAr ? "لا توجد كوبونات خصم مسجلة حتى الآن." : "No promo coupons registered yet."}
+                    </td>
+                  </tr>
+                ) : (
+                  coupons.map((c) => (
+                    <tr key={c.id} className="hover:bg-gold-500/5 transition-colors">
+                      <td className="p-3">
+                        <span className="font-mono font-bold bg-ivory-300 text-burgundy-900 px-2 py-1 rounded">
+                          {c.code}
+                        </span>
+                      </td>
+                      <td className="p-3 text-navy-950 font-bold">
+                        {c.discount_type === "percentage" 
+                          ? (isAr ? "نسبة مئوية" : "Percentage") 
+                          : (isAr ? "خصم مبلغ ثابت" : "Fixed Cash Amount")}
+                      </td>
+                      <td className="p-3 text-center font-bold text-burgundy-800">
+                        {c.discount_value} {c.discount_type === "percentage" ? "%" : (isAr ? "ج.م" : "EGP")}
+                      </td>
+                      <td className="p-3 text-navy-900/60 font-mono text-[11px]">
+                        {c.start_date ? new Date(c.start_date).toLocaleDateString(isAr ? "ar-EG" : "en-US") : "—"}
+                      </td>
+                      <td className="p-3 text-navy-900/60 font-mono text-[11px]">
+                        {c.end_date ? new Date(c.end_date).toLocaleDateString(isAr ? "ar-EG" : "en-US") : "—"}
+                      </td>
+                      <td className="p-3 text-center">
+                        <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
+                          c.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                        }`}>
+                          {c.is_active ? (isAr ? "نشط" : "Active") : (isAr ? "غير نشط" : "Inactive")}
+                        </span>
+                      </td>
+                      <td className={`p-3 flex gap-2 ${isAr ? "justify-end pt-4 text-left" : "justify-start pt-4 text-right"}`}>
+                        <button
+                          onClick={() => handleOpenEditCoupon(c)}
+                          className="text-gold-600 hover:text-burgundy-800 p-1 cursor-pointer"
+                          title={isAr ? "تعديل الكوبون" : "Edit Coupon"}
+                        >
+                          <Edit3 className="w-4.5 h-4.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCoupon(c.id)}
+                          className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
+                          title={isAr ? "حذف نهائي" : "Delete Coupon"}
+                        >
+                          <Trash2 className="w-4.5 h-4.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 6: GENERAL SYSTEM SETTINGS / RESET DATABASE */}
+      {activeTab === "settings" && (
+        <div className="space-y-6 animate-fade-in text-xs text-navy-950">
+          <div className="bg-white rounded-2xl border border-gold-500/10 p-6 md:p-8 shadow-sm space-y-6">
+            <div className={isAr ? "text-right" : "text-left"}>
+              <h3 className="font-serif text-lg font-bold text-burgundy-800">
+                {isAr ? "أدوات ضبط النظام وإعادة تعيين البيانات" : "System Administration & Database Tools"}
+              </h3>
+              <p className="text-xs text-navy-900/60 mt-1">
+                {isAr 
+                  ? "إعادة تعيين قاعدة بيانات المعرض (JSON DB) وإرجاعها لحالة المصنع الافتراضية مع المنتجات والأقسام والكوبونات الافتراضية."
+                  : "Reset the Exhibition JSON Database to its default factory state, including all default products, categories, and coupons."}
+              </p>
+            </div>
+
+            <div className="bg-red-50 border border-red-500/15 rounded-xl p-4 space-y-2">
+              <h4 className="font-bold text-red-700 flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4" />
+                <span>{isAr ? "تحذير هام جداً" : "Critical Caution"}</span>
+              </h4>
+              <p className="text-[11px] text-red-800 leading-relaxed">
+                {isAr 
+                  ? "سيؤدي هذا الإجراء لحذف كافة الطلبات، الحسابات، طلبات الحفر المخصصة، والمبيعات المخزنة نهائياً. سيتم إرجاع المعرض لقائمة المنتجات الافتراضية بأسعارها وصورها الأساسية." 
+                  : "This action will permanently delete all stored orders, custom requests, and client transaction files. The system will revert back to factory default items, categories, and initial coupons."}
+              </p>
+            </div>
+
+            <div className={isAr ? "text-right" : "text-left"}>
+              <button
+                onClick={handleResetDatabase}
+                className="bg-red-650 hover:bg-red-700 text-white font-extrabold px-6 py-3 rounded-xl border border-red-500/30 transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-red-900/10 hover:scale-[1.01]"
+              >
+                <RotateCcw className="w-4.5 h-4.5" />
+                <span>{isAr ? "إعادة تعيين قاعدة البيانات بالكامل" : "Reset System Database Snapshot"}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

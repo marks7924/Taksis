@@ -914,3 +914,19 @@ export const FAQS: FAQ[] = [
     answer_en: "Yes, we collaborate with certified Coptic iconographers and church-approved wood-carving workshops. You can fill out the 'Custom Request' form with your design and size specs."
   }
 ];
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discount_type: "percentage" | "fixed";
+  discount_value: number;
+  start_date?: string;
+  end_date?: string;
+  is_active: boolean;
+}
+
+export const INITIAL_COUPONS: Coupon[] = [
+  { id: "c-1", code: "TAXSIS10", discount_type: "percentage", discount_value: 10, is_active: true },
+  { id: "c-2", code: "COPTIC15", discount_type: "percentage", discount_value: 15, is_active: true },
+  { id: "c-3", code: "WELCOME100", discount_type: "fixed", discount_value: 100, is_active: true }
+];

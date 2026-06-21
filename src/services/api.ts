@@ -2,9 +2,9 @@
 
 import fs from "fs/promises";
 import path from "path";
-import { CATEGORIES, PRODUCTS, BRANCHES, TESTIMONIALS, FAQS } from "./db-mock-data";
-import type { Product, Category, Branch, Testimonial, FAQ } from "./db-mock-data";
-export type { Product, Category, Branch, Testimonial, FAQ };
+import { CATEGORIES, PRODUCTS, BRANCHES, TESTIMONIALS, FAQS, INITIAL_COUPONS } from "./db-mock-data";
+import type { Product, Category, Branch, Testimonial, FAQ, Coupon } from "./db-mock-data";
+export type { Product, Category, Branch, Testimonial, FAQ, Coupon };
 
 // JSON DB file path
 const DB_FILE_PATH = path.join(process.cwd(), "src", "services", "db.json");
@@ -71,18 +71,24 @@ export interface DatabaseState {
   orders: Order[];
   customRequests: CustomRequest[];
   users: UserSession[];
+  coupons?: Coupon[];
 }
 
 // Read database file
-async function readDB(): Promise<DatabaseState> {
+async function readDB(): Promise<Required<DatabaseState>> {
   try {
     await fs.mkdir(path.dirname(DB_FILE_PATH), { recursive: true });
     try {
       const data = await fs.readFile(DB_FILE_PATH, "utf-8");
-      return JSON.parse(data);
+      const state = JSON.parse(data);
+      if (!state.coupons) {
+        state.coupons = INITIAL_COUPONS;
+        await fs.writeFile(DB_FILE_PATH, JSON.stringify(state, null, 2), "utf-8");
+      }
+      return state as Required<DatabaseState>;
     } catch (e) {
       // File doesn't exist, create it with seed data
-      const initialState: DatabaseState = {
+      const initialState: Required<DatabaseState> = {
         products: PRODUCTS,
         categories: CATEGORIES,
         branches: BRANCHES,
@@ -96,7 +102,8 @@ async function readDB(): Promise<DatabaseState> {
             role: "admin",
             phone: "01220201204"
           }
-        ]
+        ],
+        coupons: INITIAL_COUPONS
       };
       await fs.writeFile(DB_FILE_PATH, JSON.stringify(initialState, null, 2), "utf-8");
       return initialState;
@@ -109,8 +116,9 @@ async function readDB(): Promise<DatabaseState> {
       branches: BRANCHES,
       orders: [],
       customRequests: [],
-      users: []
-    };
+      users: [],
+      coupons: INITIAL_COUPONS
+    } as Required<DatabaseState>;
   }
 }
 
@@ -367,4 +375,82 @@ export async function deleteCategory(id: string): Promise<boolean> {
   db.products = db.products.map(p => p.category_id === id ? { ...p, category_id: "cat-19" } : p);
   return await writeDB(db);
 }
+
+// =================== COUPONS CRUD ===================
+export async function getCoupons(): Promise<Coupon[]> {
+  const db = await readDB();
+  return db.coupons || [];
+}
+
+export async function saveCoupon(couponData: Partial<Coupon> & { id?: string }): Promise<Coupon> {
+  const db = await readDB();
+  if (!db.coupons) db.coupons = [];
+  
+  if (couponData.id) {
+    const index = db.coupons.findIndex(c => c.id === couponData.id);
+    if (index !== -1) {
+      db.coupons[index] = { ...db.coupons[index], ...couponData } as Coupon;
+    } else {
+      throw new Error("Coupon not found");
+    }
+  } else {
+    const newCoupon: Coupon = {
+      id: "coup-" + Math.random().toString(36).substr(2, 9),
+      code: (couponData.code || "").toUpperCase().trim(),
+      discount_type: couponData.discount_type || "percentage",
+      discount_value: Number(couponData.discount_value) || 0,
+      start_date: couponData.start_date || undefined,
+      end_date: couponData.end_date || undefined,
+      is_active: couponData.is_active !== undefined ? couponData.is_active : true
+    };
+    db.coupons.push(newCoupon);
+    couponData.id = newCoupon.id;
+  }
+  await writeDB(db);
+  return db.coupons.find(c => c.id === couponData.id) as Coupon;
+}
+
+export async function deleteCoupon(id: string): Promise<boolean> {
+  const db = await readDB();
+  if (!db.coupons) return false;
+  db.coupons = db.coupons.filter(c => c.id !== id);
+  return await writeDB(db);
+}
+
+export async function validateCoupon(code: string): Promise<Coupon | null> {
+  const db = await readDB();
+  if (!db.coupons) return null;
+  
+  const coupon = db.coupons.find(c => c.code.toUpperCase() === code.toUpperCase().trim());
+  if (!coupon || !coupon.is_active) return null;
+  
+  const now = new Date();
+  if (coupon.start_date && new Date(coupon.start_date) > now) return null;
+  if (coupon.end_date && new Date(coupon.end_date) < now) return null;
+  
+  return coupon;
+}
+
+export async function resetDatabase(): Promise<boolean> {
+  const initialState: Required<DatabaseState> = {
+    products: PRODUCTS,
+    categories: CATEGORIES,
+    branches: BRANCHES,
+    orders: [],
+    customRequests: [],
+    users: [
+      {
+        id: "admin-id",
+        fullName: "المدير العام طاكسيس",
+        email: "taksisdaf@gmail.com",
+        role: "admin",
+        phone: "01220201204"
+      }
+    ],
+    coupons: INITIAL_COUPONS
+  };
+  return await writeDB(initialState);
+}
+
+
 
