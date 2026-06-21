@@ -6,9 +6,6 @@ import { CATEGORIES, PRODUCTS, BRANCHES, TESTIMONIALS, FAQS, INITIAL_COUPONS } f
 import type { Product, Category, Branch, Testimonial, FAQ, Coupon } from "./db-mock-data";
 export type { Product, Category, Branch, Testimonial, FAQ, Coupon };
 
-// JSON DB file path
-const DB_FILE_PATH = path.join(process.cwd(), "src", "services", "db.json");
-
 export interface Order {
   id: string;
   tracking_number: string;
@@ -74,9 +71,23 @@ export interface DatabaseState {
   coupons?: Coupon[];
 }
 
+// In-memory fallback cache to prevent 500 errors in read-only filesystems (e.g. Vercel)
+let inMemoryDb: Required<DatabaseState> | null = null;
+
+// Determine DB File Path
+// In Serverless/Vercel environments, we must write to '/tmp' as it is the only writeable directory.
+const IS_SERVERLESS = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
+const DB_FILE_PATH = IS_SERVERLESS 
+  ? path.join("/tmp", "taksis-db.json") 
+  : path.join(process.cwd(), "src", "services", "db.json");
+
 // Read database file
 async function readDB(): Promise<Required<DatabaseState>> {
+  if (inMemoryDb) {
+    return inMemoryDb;
+  }
   try {
+    // Attempt directory creation
     await fs.mkdir(path.dirname(DB_FILE_PATH), { recursive: true });
     try {
       const data = await fs.readFile(DB_FILE_PATH, "utf-8");
@@ -105,32 +116,52 @@ async function readDB(): Promise<Required<DatabaseState>> {
         ],
         coupons: INITIAL_COUPONS
       };
-      await fs.writeFile(DB_FILE_PATH, JSON.stringify(initialState, null, 2), "utf-8");
+      try {
+        await fs.writeFile(DB_FILE_PATH, JSON.stringify(initialState, null, 2), "utf-8");
+      } catch (writeErr) {
+        console.warn("Write to DB failed, falling back to in-memory", writeErr);
+        inMemoryDb = initialState;
+      }
       return initialState;
     }
   } catch (err) {
-    console.error("Failed to read JSON DB, falling back to static", err);
-    return {
+    console.error("Failed to read JSON DB, falling back to static in-memory state", err);
+    const fallbackState: Required<DatabaseState> = {
       products: PRODUCTS,
       categories: CATEGORIES,
       branches: BRANCHES,
       orders: [],
       customRequests: [],
-      users: [],
+      users: [
+        {
+          id: "admin-id",
+          fullName: "المدير العام طاكسيس",
+          email: "taksisdaf@gmail.com",
+          role: "admin",
+          phone: "01220201204"
+        }
+      ],
       coupons: INITIAL_COUPONS
-    } as Required<DatabaseState>;
+    };
+    inMemoryDb = fallbackState;
+    return fallbackState;
   }
 }
 
 // Write database file
 async function writeDB(state: DatabaseState): Promise<boolean> {
+  if (inMemoryDb) {
+    inMemoryDb = state as Required<DatabaseState>;
+  }
   try {
     await fs.mkdir(path.dirname(DB_FILE_PATH), { recursive: true });
     await fs.writeFile(DB_FILE_PATH, JSON.stringify(state, null, 2), "utf-8");
     return true;
   } catch (err) {
-    console.error("Failed to write to JSON DB", err);
-    return false;
+    console.error("Failed to write to JSON DB, using in-memory updates", err);
+    // Set cache so future calls reuse this updated state
+    inMemoryDb = state as Required<DatabaseState>;
+    return true;
   }
 }
 

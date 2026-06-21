@@ -764,7 +764,7 @@ export const PRODUCTS: Product[] = [
     price: 20,
     category_id: "cat-10",
     stock_quantity: 400,
-    images: ["/images/حفر ميدليات.jpg"],
+    images: ["/images/حفر مدليات.jpg"],
     specifications: {
       "الخامة": "خشب"
     },
