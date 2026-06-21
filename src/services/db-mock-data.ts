@@ -250,7 +250,7 @@ export const PRODUCTS: Product[] = [
     price: 2000,
     category_id: "cat-1",
     stock_quantity: 10,
-    images: [],
+    images: ["/images/صنوج.jpg"],
     specifications: {
       "الخامة": "نحاس"
     },

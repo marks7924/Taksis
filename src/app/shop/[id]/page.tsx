@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
   Heart, ShoppingBag, Star, Sparkles, AlertTriangle, ShieldCheck, 
-  ChevronLeft, MessageSquare, Plus, Minus 
+  ChevronLeft, MessageSquare, Plus, Minus, X
 } from "lucide-react";
 import { useApp } from "@/services/store";
 import { getProductById, addProductReview, Product } from "@/services/api";
@@ -28,6 +28,14 @@ export default function ProductDetails() {
   
   // Custom engraving text state
   const [engravingText, setEngravingText] = useState("");
+  
+  // Engraving Modal States
+  const [isEngravingModalOpen, setIsEngravingModalOpen] = useState(false);
+  const [engravedItemName, setEngravedItemName] = useState("");
+  const [engravingLanguage, setEngravingLanguage] = useState("ar");
+  const [otherLanguage, setOtherLanguage] = useState("");
+  const [wordCount, setWordCount] = useState(1);
+  const [engravingWordsText, setEngravingWordsText] = useState("");
   
   // Reviews state
   const [reviewName, setReviewName] = useState("");
@@ -410,8 +418,15 @@ export default function ProductDetails() {
 
             <button
               onClick={() => {
-                const combinedVariant = selectedVariant + (engravingText ? ` [Engraving: ${engravingText}]` : "");
-                addToCart(product, quantity, combinedVariant);
+                const isEngravingProduct = product.category_id === "cat-10" || product.id === "prod-laser-eng";
+                if (isEngravingProduct) {
+                  // Pre-fill engraved item name with product name
+                  setEngravedItemName(isAr ? product.name_ar : product.name_en);
+                  setIsEngravingModalOpen(true);
+                } else {
+                  const combinedVariant = selectedVariant + (engravingText ? ` [Engraving: ${engravingText}]` : "");
+                  addToCart(product, quantity, combinedVariant);
+                }
               }}
               disabled={product.stock_quantity <= 0}
               className="flex-1 bg-burgundy-800 hover:bg-burgundy-900 disabled:bg-ivory-300 disabled:text-navy-900/30 disabled:border-transparent text-gold-300 font-extrabold px-6 py-3 rounded-xl border border-gold-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-burgundy-900/10 hover:scale-[1.02]"
@@ -577,6 +592,175 @@ export default function ProductDetails() {
         </div>
 
       </div>
+
+      {/* 5. Custom Engraving Customization Modal */}
+      {isEngravingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-ivory-100 rounded-2xl border-2 border-gold-500/20 shadow-2xl max-w-lg w-full overflow-hidden animate-fade-in-up">
+            {/* Modal Header */}
+            <div className={`p-5 bg-burgundy-800 text-white flex items-center justify-between border-b border-gold-500/15 ${isAr ? "" : "flex-row-reverse"}`}>
+              <div className="flex items-center gap-2">
+                <Sparkles className="text-gold-400 w-5 h-5" />
+                <span className="font-serif font-bold text-base">{isAr ? "تخصيص الحفر بالليزر" : "Customize Laser Engraving"}</span>
+              </div>
+              <button 
+                onClick={() => setIsEngravingModalOpen(false)}
+                className="text-white/80 hover:text-white p-1 hover:bg-white/10 rounded-full transition-all cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className={`p-6 space-y-4 max-h-[75vh] overflow-y-auto ${isAr ? "text-right" : "text-left"}`}>
+              <p className="text-xs text-navy-900/60 leading-relaxed">
+                {isAr 
+                  ? "برجاء كتابة تفاصيل الحفر وتحديد اللغة والكلمات. يتم إضافة 25 ج.م على كل كلمة حفر." 
+                  : "Please enter engraving details. Each word adds EGP 25 to the product price."}
+              </p>
+
+              {/* Item Name Input */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-navy-950 block">{isAr ? "اسم الشيء المراد حفره (مثال: اسم المنتج/المهدى إليه):" : "Item Name / Dedication Title:"}</label>
+                <input
+                  type="text"
+                  value={engravedItemName}
+                  onChange={(e) => setEngravedItemName(e.target.value)}
+                  placeholder={isAr ? "مثال: القمص بطرس أنور" : "e.g. Fr. Boutros Anwar"}
+                  className={`w-full bg-white border border-gold-500/20 rounded-lg p-2.5 text-xs focus:outline-none focus:border-gold-500 ${isAr ? "text-right" : "text-left"}`}
+                  required
+                />
+              </div>
+
+              {/* Language Selection */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-navy-950 block">{isAr ? "لغة الحفر:" : "Engraving Language:"}</label>
+                <select
+                  value={engravingLanguage}
+                  onChange={(e) => setEngravingLanguage(e.target.value)}
+                  className={`w-full bg-white border border-gold-500/20 rounded-lg p-2.5 text-xs focus:outline-none focus:border-gold-500 font-bold text-burgundy-800 ${isAr ? "text-right" : "text-left"}`}
+                >
+                  <option value="عربي">{isAr ? "عربي" : "Arabic"}</option>
+                  <option value="إنجليزية">{isAr ? "إنجليزي" : "English"}</option>
+                  <option value="قبطية">{isAr ? "قبطي" : "Coptic"}</option>
+                  <option value="other">{isAr ? "لغة أخرى (يرجى كتابتها)" : "Other (Please specify)"}</option>
+                </select>
+              </div>
+
+              {/* Other Language Text Input */}
+              {engravingLanguage === "other" && (
+                <div className="space-y-1.5 animate-fade-in">
+                  <label className="text-xs font-bold text-navy-950 block">{isAr ? "اكتب اللغة الأخرى:" : "Specify other language:"}</label>
+                  <input
+                    type="text"
+                    value={otherLanguage}
+                    onChange={(e) => setOtherLanguage(e.target.value)}
+                    placeholder={isAr ? "مثال: سرياني، يوناني..." : "e.g. Syriac, Greek..."}
+                    className={`w-full bg-white border border-gold-500/20 rounded-lg p-2.5 text-xs focus:outline-none focus:border-gold-500 ${isAr ? "text-right" : "text-left"}`}
+                    required
+                  />
+                </div>
+              )}
+
+              {/* Word Count */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-navy-950 block">{isAr ? "عدد الكلمات:" : "Word Count:"}</label>
+                <div className={`flex items-center gap-3 ${isAr ? "flex-row" : "flex-row-reverse justify-end"}`}>
+                  <div className="flex items-center border border-gold-500/20 rounded-lg bg-white overflow-hidden shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setWordCount(prev => Math.max(1, prev - 1))}
+                      className="px-3 py-1.5 text-burgundy-800 hover:bg-gold-500/10 transition-colors"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="px-4 text-xs font-bold">{wordCount}</span>
+                    <button
+                      type="button"
+                      onClick={() => setWordCount(prev => prev + 1)}
+                      className="px-3 py-1.5 text-burgundy-800 hover:bg-gold-500/10 transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <span className="text-[11px] text-navy-900/50">({isAr ? "التكلفة الإضافية: " : "Extra cost: "} {wordCount * 25} {isAr ? "ج.م" : "EGP"})</span>
+                </div>
+              </div>
+
+              {/* Words Textarea */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-navy-950 block">{isAr ? "الكلمات المراد حفرها:" : "Words to Engrave:"}</label>
+                <textarea
+                  value={engravingWordsText}
+                  onChange={(e) => setEngravingWordsText(e.target.value)}
+                  placeholder={isAr ? "اكتب العبارة أو الكلمات هنا..." : "Write your custom engraving text here..."}
+                  rows={3}
+                  className={`w-full bg-white border border-gold-500/20 rounded-lg p-2.5 text-xs focus:outline-none focus:border-gold-500 resize-none ${isAr ? "text-right" : "text-left"}`}
+                  required
+                />
+              </div>
+
+              {/* Price Calculation Box */}
+              <div className="bg-gold-500/10 border border-gold-500/25 p-4 rounded-xl space-y-2 text-xs font-semibold text-navy-955">
+                <div className="flex justify-between">
+                  <span>{isAr ? "سعر المنتج الأصلي:" : "Original Price:"}</span>
+                  <span>{isAr ? `${displayPrice * quantity} ج.م` : `EGP ${displayPrice * quantity}`}</span>
+                </div>
+                <div className="flex justify-between text-burgundy-800">
+                  <span>{isAr ? "تكلفة الحفر الإضافية (لكل قطعة):" : "Extra Engraving Cost (Per Item):"}</span>
+                  <span>{isAr ? `+ ${wordCount * 25} ج.م` : `+ EGP ${wordCount * 25}`}</span>
+                </div>
+                <div className="border-t border-gold-500/20 pt-2 flex justify-between text-sm font-bold">
+                  <span>{isAr ? "السعر الإجمالي الكلي:" : "Total Adjusted Price:"}</span>
+                  <span className="text-burgundy-800">{isAr ? `${(displayPrice + (wordCount * 25)) * quantity} ج.م` : `EGP ${(displayPrice + (wordCount * 25)) * quantity}`}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-ivory-200 border-t border-gold-500/15 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setIsEngravingModalOpen(false)}
+                className="flex-1 border border-navy-900/20 text-navy-900/70 hover:bg-white/50 py-2.5 rounded-lg text-xs font-bold transition-all"
+              >
+                {isAr ? "إلغاء" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!engravedItemName.trim() || !engravingWordsText.trim()) return;
+                  const finalLanguage = engravingLanguage === "other" ? otherLanguage : engravingLanguage;
+                  const extraCost = wordCount * 25;
+                  
+                  // Clone product and adjust price
+                  const adjustedProduct = {
+                    ...product,
+                    price: product.price + extraCost,
+                    discount_price: product.discount_price ? product.discount_price + extraCost : undefined
+                  };
+                  
+                  const combinedVariant = `${selectedVariant ? selectedVariant + " | " : ""}${isAr ? "حفر اسم" : "Engraving Name"}: ${engravedItemName} | ${isAr ? "اللغة" : "Lang"}: ${finalLanguage} | ${isAr ? "الكلمات" : "Words"}: "${engravingWordsText}" (${wordCount} ${isAr ? "كلمات" : "words"})`;
+                  
+                  addToCart(adjustedProduct, quantity, combinedVariant);
+                  setIsEngravingModalOpen(false);
+                  
+                  // Reset states
+                  setEngravedItemName("");
+                  setEngravingLanguage("عربي");
+                  setOtherLanguage("");
+                  setWordCount(1);
+                  setEngravingWordsText("");
+                }}
+                disabled={!engravedItemName.trim() || !engravingWordsText.trim() || (engravingLanguage === "other" && !otherLanguage.trim())}
+                className="flex-1 bg-burgundy-800 hover:bg-burgundy-900 disabled:bg-ivory-300 disabled:text-navy-900/30 disabled:border-transparent text-gold-300 font-bold py-2.5 rounded-lg text-xs border border-gold-500/30 transition-all text-center"
+              >
+                {isAr ? "تأكيد وإضافة للسلة" : "Confirm & Add"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

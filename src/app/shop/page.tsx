@@ -372,8 +372,15 @@ function ShopCatalog() {
                           </span>
                         </div>
 
-                        <button
-                          onClick={() => addToCart(product, 1)}
+                         <button
+                          onClick={() => {
+                            const isEngravingProduct = product.category_id === "cat-10" || product.id === "prod-laser-eng";
+                            if (isEngravingProduct) {
+                              router.push(`/shop/${product.id}`);
+                            } else {
+                              addToCart(product, 1);
+                            }
+                          }}
                           disabled={product.stock_quantity <= 0}
                           className="bg-gold-500 hover:bg-gold-600 text-burgundy-900 disabled:bg-ivory-300 disabled:text-navy-900/30 disabled:border-transparent font-bold p-2 px-3 rounded-lg border border-gold-400 text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
