@@ -15,7 +15,8 @@ export default function Header() {
   const { 
     cart, updateCartQuantity, removeFromCart, clearCart,
     wishlist, currentUser, logoutUser, loginUser,
-    notifications, markNotificationsAsRead
+    notifications, markNotificationsAsRead,
+    language, setLanguage
   } = useApp();
 
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -30,17 +31,26 @@ export default function Header() {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const unreadNotifs = notifications.filter(n => !n.read).length;
 
+  const isAr = language === "ar";
+
   // Simple category shortcuts
-  const categoriesShort = [
+  const categoriesShort = isAr ? [
     { name: "ملابس كهنوتية", path: "/shop?category=cat-6" },
     { name: "طونيات شماس", path: "/shop?category=cat-4" },
     { name: "أواني المذبح", path: "/shop?category=cat-8" },
     { name: "دفوف وصنوج", path: "/shop?category=cat-1" },
     { name: "كتب كنسية", path: "/shop?category=cat-9" },
     { name: "أيقونات يدوية", path: "/shop?category=cat-10" }
+  ] : [
+    { name: "Clergy Vestments", path: "/shop?category=cat-6" },
+    { name: "Deacon Tonias", path: "/shop?category=cat-4" },
+    { name: "Altar Vessels", path: "/shop?category=cat-8" },
+    { name: "Cymbals & Dafs", path: "/shop?category=cat-1" },
+    { name: "Church Books", path: "/shop?category=cat-9" },
+    { name: "Handmade Icons", path: "/shop?category=cat-10" }
   ];
 
-  const mainLinks = [
+  const mainLinks = isAr ? [
     { name: "الرئيسية", path: "/" },
     { name: "المتجر الكامل", path: "/shop" },
     { name: "طلبات خاصة ومخصصة", path: "/custom-orders" },
@@ -48,6 +58,14 @@ export default function Header() {
     { name: "معرض الأعمال", path: "/gallery" },
     { name: "قصتنا وعن طاكسيس", path: "/about" },
     { name: "تواصل معنا", path: "/contact" }
+  ] : [
+    { name: "Home", path: "/" },
+    { name: "Full Shop", path: "/shop" },
+    { name: "Custom Orders", path: "/custom-orders" },
+    { name: "Our Branches", path: "/branches" },
+    { name: "Work Gallery", path: "/gallery" },
+    { name: "Our Story", path: "/about" },
+    { name: "Contact Us", path: "/contact" }
   ];
 
   return (
@@ -57,12 +75,12 @@ export default function Header() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
           <div className="flex items-center gap-2">
             <Sparkles className="w-3.5 h-3.5 text-gold-400 animate-pulse" />
-            <span>معارض طاكسيس لمستلزمات الكهنة والشمامسة والكنائس بالأرثوذكسية</span>
+            <span>{isAr ? "معارض طاكسيس لمستلزمات الكهنة والشمامسة والكنائس بالأرثوذكسية" : "Taxsis Showrooms for Orthodox Clergy, Deacon, and Church Supplies"}</span>
           </div>
           <div className="flex items-center gap-4 text-white/80">
-            <span>توصيل لكافة المحافظات وشحن دولي</span>
+            <span>{isAr ? "توصيل لكافة المحافظات وشحن دولي" : "Worldwide shipping & local delivery"}</span>
             <span className="text-gold-400">|</span>
-            <a href="tel:01220201204" className="hover:text-gold-300 transition-colors">اتصل بنا: 01220201204</a>
+            <a href="tel:01220201204" className="hover:text-gold-300 transition-colors">{isAr ? "اتصل بنا" : "Call us"}: 01220201204</a>
           </div>
         </div>
       </div>
@@ -76,7 +94,7 @@ export default function Header() {
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden text-burgundy-800 p-2 hover:bg-gold-500/10 rounded-lg transition-colors"
-              aria-label="القائمة"
+              aria-label={isAr ? "القائمة" : "Menu"}
             >
               <Menu className="w-6 h-6" />
             </button>
@@ -87,7 +105,7 @@ export default function Header() {
                 طاكسيس
               </span>
               <span className="text-[10px] sm:text-xs font-serif font-semibold text-gold-600 tracking-widest mt-[-2px] uppercase">
-                للشماس والقسيس
+                {isAr ? "للشماس والقسيس" : "For Deacon & Priest"}
               </span>
             </Link>
           </div>
@@ -118,7 +136,7 @@ export default function Header() {
             <button
               onClick={() => setIsSearchOpen(true)}
               className="text-burgundy-800 p-2 hover:bg-gold-500/10 rounded-full transition-all"
-              title="البحث"
+              title={isAr ? "البحث" : "Search"}
             >
               <Search className="w-5 h-5 sm:w-6 h-6" />
             </button>
@@ -127,7 +145,7 @@ export default function Header() {
             <Link
               href="/shop?wishlist=true"
               className="relative text-burgundy-800 p-2 hover:bg-gold-500/10 rounded-full transition-all hidden sm:inline-flex"
-              title="المفضلة"
+              title={isAr ? "المفضلة" : "Wishlist"}
             >
               <Heart className="w-5 h-5 sm:w-6 h-6" />
               {wishlist.length > 0 && (
@@ -144,7 +162,7 @@ export default function Header() {
                 markNotificationsAsRead();
               }}
               className="relative text-burgundy-800 p-2 hover:bg-gold-500/10 rounded-full transition-all"
-              title="الإشعارات"
+              title={isAr ? "الإشعارات" : "Notifications"}
             >
               <Bell className="w-5 h-5 sm:w-6 h-6" />
               {unreadNotifs > 0 && (
@@ -154,12 +172,21 @@ export default function Header() {
               )}
             </button>
 
+            {/* Language Switcher */}
+            <button
+              onClick={() => setLanguage(isAr ? "en" : "ar")}
+              className="text-burgundy-800 p-2 hover:bg-gold-500/10 rounded-full transition-all text-xs font-bold font-serif focus:outline-none flex items-center justify-center min-w-9 h-9 cursor-pointer"
+              title={isAr ? "Switch to English" : "تغيير للعربية"}
+            >
+              {isAr ? "EN" : "عربي"}
+            </button>
+
             {/* User Account Portal Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="text-burgundy-800 p-2 hover:bg-gold-500/10 rounded-full transition-all flex items-center gap-1"
-                title="حسابي"
+                className="text-burgundy-800 p-2 hover:bg-gold-500/10 rounded-full transition-all flex items-center gap-1 cursor-pointer"
+                title={isAr ? "حسابي" : "My Account"}
               >
                 <User className="w-5 h-5 sm:w-6 h-6" />
               </button>

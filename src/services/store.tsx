@@ -33,6 +33,9 @@ interface AppContextType {
   notifications: { id: string; message: string; date: string; read: boolean }[];
   addNotification: (message: string) => void;
   markNotificationsAsRead: () => void;
+
+  language: "ar" | "en";
+  setLanguage: (lang: "ar" | "en") => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -44,10 +47,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [notifications, setNotifications] = useState<{ id: string; message: string; date: string; read: boolean }[]>([]);
+  const [language, setLanguageState] = useState<"ar" | "en">("ar");
 
   // Load state on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const storedLang = localStorage.getItem("taxsis_lang") as "ar" | "en" | null;
+      if (storedLang) {
+        setLanguageState(storedLang);
+        document.documentElement.dir = storedLang === "ar" ? "rtl" : "ltr";
+        document.documentElement.lang = storedLang;
+      } else {
+        document.documentElement.dir = "rtl";
+        document.documentElement.lang = "ar";
+      }
+
       const storedCart = localStorage.getItem("taxsis_cart");
       if (storedCart) setCart(JSON.parse(storedCart));
 
@@ -72,6 +86,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     }
   }, []);
+
+  const setLanguage = (lang: "ar" | "en") => {
+    setLanguageState(lang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("taxsis_lang", lang);
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+      document.documentElement.lang = lang;
+    }
+  };
 
   // Sync helpers
   const saveCart = (newCart: CartItem[]) => {
@@ -228,7 +251,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         logoutUser,
         notifications,
         addNotification,
-        markNotificationsAsRead
+        markNotificationsAsRead,
+        language,
+        setLanguage
       }}
     >
       {children}

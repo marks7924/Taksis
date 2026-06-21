@@ -13,7 +13,7 @@ import { createOrder, Order } from "@/services/api";
 function CheckoutForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { cart, clearCart, currentUser, addNotification } = useApp();
+  const { cart, clearCart, currentUser, addNotification, language } = useApp();
 
   // URL Params values
   const paramCoupon = searchParams.get("coupon") || "";
@@ -67,6 +67,10 @@ function CheckoutForm() {
   const getShippingCost = () => {
     if (governorate === "cairo" || governorate === "giza") return 50;
     if (governorate === "alex") return 80;
+    if (governorate === "egypt_others") return 100;
+    if (governorate === "arab_countries") return 950;
+    if (governorate === "europe_americas") return 1800;
+    if (governorate === "rest_of_world") return 2500;
     return 100;
   };
   const shippingCost = getShippingCost();
@@ -358,16 +362,23 @@ function CheckoutForm() {
 
               {/* Governorate selection */}
               <div className="space-y-1">
-                <label className="font-bold">المحافظة:</label>
+                <label className="font-bold">{language === "ar" ? "الدولة / وجهة الشحن:" : "Country / Shipping Destination:"}</label>
                 <select
                   value={governorate}
                   onChange={(e) => setGovernorate(e.target.value)}
                   className="w-full bg-ivory-200 border border-gold-500/10 rounded-lg p-2.5 text-right font-bold focus:outline-none focus:border-gold-500"
                 >
-                  <option value="cairo">القاهرة الكبرى</option>
-                  <option value="giza">الجيزة</option>
-                  <option value="alex">الإسكندرية</option>
-                  <option value="others">محافظة أخرى</option>
+                  <optgroup label={language === "ar" ? "جمهورية مصر العربية" : "Egypt"}>
+                    <option value="cairo">{language === "ar" ? "القاهرة الكبرى" : "Cairo"}</option>
+                    <option value="giza">{language === "ar" ? "الجيزة" : "Giza"}</option>
+                    <option value="alex">{language === "ar" ? "الإسكندرية" : "Alexandria"}</option>
+                    <option value="egypt_others">{language === "ar" ? "باقي المحافظات" : "Other Governorates"}</option>
+                  </optgroup>
+                  <optgroup label={language === "ar" ? "شحن دولي" : "International Shipping"}>
+                    <option value="arab_countries">{language === "ar" ? "الدول العربية والخليج" : "Arab Countries & Gulf"}</option>
+                    <option value="europe_americas">{language === "ar" ? "أوروبا وأمريكا وأستراليا (بلاد المهجر)" : "Europe, Americas & Australia"}</option>
+                    <option value="rest_of_world">{language === "ar" ? "باقي دول العالم" : "Rest of the World"}</option>
+                  </optgroup>
                 </select>
               </div>
             </div>

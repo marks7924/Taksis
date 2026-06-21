@@ -12,9 +12,10 @@ import {
   getProducts, saveProduct, deleteProduct, 
   getOrders, updateOrderStatus, 
   getCustomRequests, updateCustomRequestStatus,
+  getCategories, saveCategory, deleteCategory,
   Order, CustomRequest
 } from "@/services/api";
-import { CATEGORIES, Product } from "@/services/db-mock-data";
+import { Product, Category } from "@/services/db-mock-data";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -27,13 +28,22 @@ export default function AdminDashboard() {
   }, [currentUser]);
 
   // Tab state
-  const [activeTab, setActiveTab] = useState<"overview" | "products" | "orders" | "customs" | "settings">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "products" | "categories" | "orders" | "customs" | "settings">("overview");
 
   // Database Data States
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [customs, setCustoms] = useState<CustomRequest[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Form States for categories
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [catFormId, setCatFormId] = useState<string | undefined>(undefined);
+  const [catFormNameAr, setCatFormNameAr] = useState("");
+  const [catFormNameEn, setCatFormNameEn] = useState("");
+  const [catFormSlug, setCatFormSlug] = useState("");
+  const [catFormImage, setCatFormImage] = useState("");
 
   // Form States for adding/editing product
   const [showProductForm, setShowProductForm] = useState(false);
@@ -60,7 +70,9 @@ export default function AdminDashboard() {
       const p = await getProducts();
       const o = await getOrders();
       const c = await getCustomRequests();
+      const cats = await getCategories();
       setProducts(p);
+      setCategories(cats);
       setOrders(o);
       setCustoms(c);
     } catch (err) {
@@ -139,6 +151,55 @@ export default function AdminDashboard() {
     try {
       await deleteProduct(id);
       addNotification("تم حذف المنتج بنجاح");
+      loadDatabase();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Category handlers
+  const handleOpenAddCategory = () => {
+    setCatFormId(undefined);
+    setCatFormNameAr("");
+    setCatFormNameEn("");
+    setCatFormSlug("");
+    setCatFormImage("");
+    setShowCategoryForm(true);
+  };
+
+  const handleOpenEditCategory = (c: Category) => {
+    setCatFormId(c.id);
+    setCatFormNameAr(c.name_ar);
+    setCatFormNameEn(c.name_en);
+    setCatFormSlug(c.slug);
+    setCatFormImage(c.image_url);
+    setShowCategoryForm(true);
+  };
+
+  const handleCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await saveCategory({
+        id: catFormId,
+        name_ar: catFormNameAr,
+        name_en: catFormNameEn,
+        slug: catFormSlug || undefined,
+        image_url: catFormImage || undefined
+      });
+      addNotification(catFormId ? "تم تعديل القسم الكنسي بنجاح" : "تم إضافة قسم كنسي جديد بنجاح");
+      setShowCategoryForm(false);
+      loadDatabase();
+    } catch (err) {
+      console.error(err);
+      alert("حدث خطأ أثناء حفظ القسم");
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!confirm("هل أنت متأكد من حذف هذا القسم؟ سيتم نقل المنتجات المرتبطة به لقسم 'منتجات أخرى'.")) return;
+    try {
+      await deleteCategory(id);
+      addNotification("تم حذف القسم الكنسي بنجاح");
       loadDatabase();
     } catch (err) {
       console.error(err);
@@ -225,6 +286,16 @@ export default function AdminDashboard() {
         >
           <Package className="w-4.5 h-4.5" />
           <span>المخزون والمنتجات ({products.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("categories")}
+          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            activeTab === "categories" ? "bg-burgundy-800 text-gold-300 shadow" : "text-navy-800 hover:bg-gold-500/10"
+          }`}
+        >
+          <Settings className="w-4.5 h-4.5" />
+          <span>الأقسام والكاتيجوريز ({categories.length})</span>
         </button>
 
         <button
@@ -460,7 +531,7 @@ export default function AdminDashboard() {
                       onChange={(e) => setFormCategory(e.target.value)}
                       className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none text-right font-semibold"
                     >
-                      {CATEGORIES.map(c => (
+                      {categories.map(c => (
                         <option key={c.id} value={c.id}>{c.name_ar}</option>
                       ))}
                     </select>
@@ -542,7 +613,7 @@ export default function AdminDashboard() {
                     <td className="p-3 font-mono font-bold text-gold-600">{p.sku}</td>
                     <td className="p-3 font-bold text-navy-950">{p.name_ar}</td>
                     <td className="p-3 text-[10px] text-navy-900/60">
-                      {CATEGORIES.find(c => c.id === p.category_id)?.name_ar}
+                      {categories.find(c => c.id === p.category_id)?.name_ar}
                     </td>
                     <td className="p-3 text-center font-bold">
                       {p.price} ج.م / {p.discount_price ? `${p.discount_price} ج.م` : "بلا"}
@@ -565,6 +636,143 @@ export default function AdminDashboard() {
                       <button
                         onClick={() => handleDeleteProduct(p.id)}
                         className="text-red-500 hover:text-red-700 p-1"
+                        title="حذف نهائي"
+                      >
+                        <Trash2 className="w-4.5 h-4.5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      )}
+
+      {/* TAB 2.5: CATEGORIES CRUD MANAGEMENT */}
+      {activeTab === "categories" && (
+        <div className="space-y-6 animate-fade-in text-xs text-navy-950">
+          
+          <div className="flex justify-between items-center">
+            <h3 className="font-serif text-base font-bold text-burgundy-800">إدارة الأقسام والكاتيجوريز الكنسية</h3>
+            <button
+              onClick={handleOpenAddCategory}
+              className="bg-gold-500 hover:bg-gold-600 text-burgundy-900 font-extrabold px-4 py-2.5 rounded-lg text-xs border border-gold-400 cursor-pointer flex items-center gap-1"
+            >
+              <Plus className="w-4 h-4" />
+              <span>إضافة قسم كنسي جديد</span>
+            </button>
+          </div>
+
+          {showCategoryForm && (
+            <div className="bg-ivory-200 border-2 border-gold-500/25 p-6 rounded-2xl shadow-lg animate-fade-in text-xs text-navy-950">
+              <form onSubmit={handleCategorySubmit} className="space-y-6">
+                <h4 className="font-serif text-sm font-bold text-burgundy-800 border-b border-gold-500/10 pb-2 mb-4">
+                  {catFormId ? "تعديل بيانات القسم الكنسي" : "إضافة قسم كنسي جديد"}
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="font-bold">اسم القسم بالعربية:</label>
+                    <input
+                      type="text"
+                      value={catFormNameAr}
+                      onChange={(e) => setCatFormNameAr(e.target.value)}
+                      placeholder="الأيقونات القبطية..."
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold">اسم القسم بالإنجليزية:</label>
+                    <input
+                      type="text"
+                      value={catFormNameEn}
+                      onChange={(e) => setCatFormNameEn(e.target.value)}
+                      placeholder="Coptic Icons..."
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold">Slug (الرمز المميز في الرابط):</label>
+                    <input
+                      type="text"
+                      value={catFormSlug}
+                      onChange={(e) => setCatFormSlug(e.target.value)}
+                      placeholder="coptic-icons"
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold">رابط صورة القسم:</label>
+                    <input
+                      type="text"
+                      value={catFormImage}
+                      onChange={(e) => setCatFormImage(e.target.value)}
+                      placeholder="https://images.unsplash.com/..."
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-2 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowCategoryForm(false)}
+                    className="bg-white border rounded px-4 py-2 cursor-pointer"
+                  >
+                    إلغاء والعودة
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-burgundy-800 text-gold-300 font-bold px-6 py-2 rounded border border-gold-500/20 cursor-pointer"
+                  >
+                    حفظ وتأكيد القسم
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Table display */}
+          <div className="bg-white rounded-2xl border border-gold-500/10 overflow-hidden shadow-sm">
+            <table className="w-full text-right text-xs">
+              <thead className="bg-ivory-200 border-b border-gold-500/10 font-bold text-navy-950">
+                <tr>
+                  <th className="p-3">صورة القسم</th>
+                  <th className="p-3">الاسم بالعربية</th>
+                  <th className="p-3">الاسم بالإنجليزية</th>
+                  <th className="p-3">الرمز Slug</th>
+                  <th className="p-3 text-left">التحكم</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gold-500/5 font-semibold text-navy-900/80">
+                {categories.map((c) => (
+                  <tr key={c.id} className="hover:bg-gold-500/5 transition-colors">
+                    <td className="p-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={c.image_url} alt={c.name_ar} className="w-10 h-10 object-cover rounded border border-gold-500/10" />
+                    </td>
+                    <td className="p-3 font-bold text-navy-950">{c.name_ar}</td>
+                    <td className="p-3 font-bold text-navy-950">{c.name_en}</td>
+                    <td className="p-3 font-mono font-bold text-gold-600">{c.slug}</td>
+                    <td className="p-3 text-left flex gap-2 justify-end pt-5">
+                      <button
+                        onClick={() => handleOpenEditCategory(c)}
+                        className="text-gold-600 hover:text-burgundy-800 p-1 cursor-pointer"
+                        title="تعديل القسم"
+                      >
+                        <Edit3 className="w-4.5 h-4.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCategory(c.id)}
+                        className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
                         title="حذف نهائي"
                       >
                         <Trash2 className="w-4.5 h-4.5" />

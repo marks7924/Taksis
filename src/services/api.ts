@@ -332,3 +332,39 @@ export async function mockLogin(email: string, role?: string): Promise<UserSessi
   await writeDB(db);
   return newUser;
 }
+
+// =================== CATEGORY CRUD OPERATIONS ===================
+export async function saveCategory(categoryData: Partial<Category> & { id?: string }): Promise<Category> {
+  const db = await readDB();
+  if (categoryData.id) {
+    // Edit
+    const index = db.categories.findIndex(c => c.id === categoryData.id);
+    if (index !== -1) {
+      db.categories[index] = { ...db.categories[index], ...categoryData } as Category;
+    } else {
+      throw new Error("Category not found");
+    }
+  } else {
+    // Add new
+    const newCategory: Category = {
+      id: "cat-" + Math.random().toString(36).substr(2, 9),
+      name_ar: categoryData.name_ar || "",
+      name_en: categoryData.name_en || "",
+      slug: categoryData.slug || "cat-" + Math.random().toString(36).substr(2, 6),
+      image_url: categoryData.image_url || "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80"
+    };
+    db.categories.push(newCategory);
+    categoryData.id = newCategory.id;
+  }
+  await writeDB(db);
+  return db.categories.find(c => c.id === categoryData.id) as Category;
+}
+
+export async function deleteCategory(id: string): Promise<boolean> {
+  const db = await readDB();
+  db.categories = db.categories.filter(c => c.id !== id);
+  // Re-assign products under this category to cat-19
+  db.products = db.products.map(p => p.category_id === id ? { ...p, category_id: "cat-19" } : p);
+  return await writeDB(db);
+}
+
