@@ -81,7 +81,6 @@ const DB_FILE_PATH = IS_SERVERLESS
   ? path.join("/tmp", "taksis-db.json") 
   : path.join(process.cwd(), "src", "services", "db.json");
 
-// Read database file
 async function readDB(): Promise<Required<DatabaseState>> {
   if (inMemoryDb) {
     return inMemoryDb;
@@ -93,11 +92,11 @@ async function readDB(): Promise<Required<DatabaseState>> {
       const data = await fs.readFile(DB_FILE_PATH, "utf-8");
       const state = JSON.parse(data);
       
-      // Merge defaults if keys are missing from older database snapshots
+      // Merge defaults if keys are missing or empty from older database snapshots
       let modified = false;
-      if (!state.products) { state.products = PRODUCTS; modified = true; }
-      if (!state.categories) { state.categories = CATEGORIES; modified = true; }
-      if (!state.branches) { state.branches = BRANCHES; modified = true; }
+      if (!state.products || state.products.length === 0) { state.products = [...PRODUCTS]; modified = true; }
+      if (!state.categories || state.categories.length === 0) { state.categories = [...CATEGORIES]; modified = true; }
+      if (!state.branches || state.branches.length === 0) { state.branches = [...BRANCHES]; modified = true; }
       if (!state.orders) { state.orders = []; modified = true; }
       if (!state.customRequests) { state.customRequests = []; modified = true; }
       if (!state.users) {
@@ -112,8 +111,17 @@ async function readDB(): Promise<Required<DatabaseState>> {
         ];
         modified = true;
       }
-      if (!state.coupons) { state.coupons = INITIAL_COUPONS; modified = true; }
+      if (!state.coupons || state.coupons.length === 0) { state.coupons = [...INITIAL_COUPONS]; modified = true; }
       
+      // Make sure all arrays are clones to avoid "object is not extensible" freezes in Serverless runtime
+      state.products = [...state.products];
+      state.categories = [...state.categories];
+      state.branches = [...state.branches];
+      state.orders = [...state.orders];
+      state.customRequests = [...state.customRequests];
+      state.users = [...state.users];
+      state.coupons = [...state.coupons];
+
       if (modified) {
         try {
           await fs.writeFile(DB_FILE_PATH, JSON.stringify(state, null, 2), "utf-8");
@@ -126,9 +134,9 @@ async function readDB(): Promise<Required<DatabaseState>> {
     } catch (e) {
       // File doesn't exist or is invalid JSON, create it with seed data
       const initialState: Required<DatabaseState> = {
-        products: PRODUCTS,
-        categories: CATEGORIES,
-        branches: BRANCHES,
+        products: [...PRODUCTS],
+        categories: [...CATEGORIES],
+        branches: [...BRANCHES],
         orders: [],
         customRequests: [],
         users: [
@@ -140,7 +148,7 @@ async function readDB(): Promise<Required<DatabaseState>> {
             phone: "01220201204"
           }
         ],
-        coupons: INITIAL_COUPONS
+        coupons: [...INITIAL_COUPONS]
       };
       try {
         await fs.writeFile(DB_FILE_PATH, JSON.stringify(initialState, null, 2), "utf-8");
@@ -153,9 +161,9 @@ async function readDB(): Promise<Required<DatabaseState>> {
   } catch (err) {
     console.error("Failed to read JSON DB, falling back to static in-memory state", err);
     const fallbackState: Required<DatabaseState> = {
-      products: PRODUCTS,
-      categories: CATEGORIES,
-      branches: BRANCHES,
+      products: [...PRODUCTS],
+      categories: [...CATEGORIES],
+      branches: [...BRANCHES],
       orders: [],
       customRequests: [],
       users: [
@@ -167,12 +175,13 @@ async function readDB(): Promise<Required<DatabaseState>> {
           phone: "01220201204"
         }
       ],
-      coupons: INITIAL_COUPONS
+      coupons: [...INITIAL_COUPONS]
     };
     inMemoryDb = fallbackState;
     return fallbackState;
   }
 }
+
 
 // Write database file
 async function writeDB(state: DatabaseState): Promise<boolean> {
@@ -489,9 +498,9 @@ export async function validateCoupon(code: string): Promise<Coupon | null> {
 
 export async function resetDatabase(): Promise<boolean> {
   const initialState: Required<DatabaseState> = {
-    products: PRODUCTS,
-    categories: CATEGORIES,
-    branches: BRANCHES,
+    products: [...PRODUCTS],
+    categories: [...CATEGORIES],
+    branches: [...BRANCHES],
     orders: [],
     customRequests: [],
     users: [
@@ -503,7 +512,7 @@ export async function resetDatabase(): Promise<boolean> {
         phone: "01220201204"
       }
     ],
-    coupons: INITIAL_COUPONS
+    coupons: [...INITIAL_COUPONS]
   };
   return await writeDB(initialState);
 }
