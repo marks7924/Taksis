@@ -47,9 +47,12 @@ export interface Branch {
 
 export interface Testimonial {
   id: string;
-  name: string;
-  role: string;
-  text: string;
+  name_ar: string;
+  name_en: string;
+  role_ar: string;
+  role_en: string;
+  text_ar: string;
+  text_en: string;
   rating: number;
 }
 
@@ -631,23 +634,32 @@ export const BRANCHES: Branch[] = [
 export const TESTIMONIALS: Testimonial[] = [
   {
     id: "t-1",
-    name: "القمص بطرس أنور",
-    role: "كاهن كنيسة بالمنيا",
-    text: "تعاملت مع طاكسيس لتفصيل ملابس الخدمة والبرنص الكهنوتي، وخامة الحرير سوري والتطريز بالخيوط الذهبية يفوق الوصف. دقة متناهية والتزام كامل بالمواعيد والطقس الكنسي السليم.",
+    name_ar: "القمص بطرس أنور",
+    name_en: "Fr. Boutros Anwar",
+    role_ar: "كاهن كنيسة بالمنيا",
+    role_en: "Priest in Minya",
+    text_ar: "تعاملت مع طاكسيس لتفصيل ملابس الخدمة والبرنص الكهنوتي، وخامة الحرير سوري والتطريز بالخيوط الذهبية يفوق الوصف. دقة متناهية والتزام كامل بالمواعيد والطقس الكنسي السليم.",
+    text_en: "I commissioned Taxsis to tailor my liturgical vestments and priest phelonion (burnus). The Syrian silk and detailed golden embroidery are beyond description. Complete accuracy, timely delivery, and correct liturgical styling.",
     rating: 5
   },
   {
     id: "t-2",
-    name: "الشماس يوحنا كمال",
-    role: "مرتل بكنيسة العذراء",
-    text: "الدفوف النحاسية من طاكسيس صوتها نقي ورنان جداً في الألحان والتسبحة. أشتري منهم أدوات الخدمة منذ سنوات وهي دائماً الخيار الأول لنا.",
+    name_ar: "الشماس يوحنا كمال",
+    name_en: "Deacon John Kamal",
+    role_ar: "مرتل بكنيسة العذراء",
+    role_en: "Cantor at St. Mary Church",
+    text_ar: "الدفوف النحاسية من طاكسيس صوتها نقي ورنان جداً في الألحان والتسبحة. أشتري منهم أدوات الخدمة منذ سنوات وهي دائماً الخيار الأول لنا.",
+    text_en: "The brass cymbals from Taxsis produce an incredibly pure and resonant acoustic tone for liturgy and praises. I have been buying our service instruments from them for years, and they are always our first choice.",
     rating: 5
   },
   {
     id: "t-3",
-    name: "م. مايكل نجيب",
-    role: "أمين خدمة الكشافة بمصر الجديدة",
-    text: "قمنا بطلب دروع خشبية محفورة وهدايا تذكارية للشباب في الكنيسة، وتجاوبهم مع التعديلات كان ممتازاً والأسعار مناسبة جداً للكميات الكبيرة.",
+    name_ar: "م. مايكل نجيب",
+    name_en: "Eng. Michael Naguib",
+    role_ar: "أمين خدمة الكشافة بمصر الجديدة",
+    role_en: "Scouts Service Leader in Heliopolis",
+    text_ar: "قمنا بطلب دروع خشبية محفورة وهدايا تذكارية للشباب في الكنيسة، وتجاوبهم مع التعديلات كان ممتازاً والأسعار مناسبة جداً للكميات الكبيرة.",
+    text_en: "We ordered engraved wooden plaques and spiritual souvenirs for the youth scouts. Their response to design revisions was excellent, and the pricing is very reasonable for bulk orders.",
     rating: 4.8
   }
 ];

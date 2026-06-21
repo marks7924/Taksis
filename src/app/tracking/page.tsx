@@ -2,19 +2,20 @@
 
 import React, { useState } from "react";
 import { 
-  Search, ClipboardList, CheckCircle2, Truck, Box, Calendar, 
-  ArrowLeft, RefreshCw, AlertTriangle, ShieldCheck, Mail 
+  Search, ClipboardList, Box, Truck, RefreshCw, AlertTriangle, ShieldCheck
 } from "lucide-react";
 import { getOrderByTracking, Order } from "@/services/api";
 import { useApp } from "@/services/store";
 
 export default function OrderTracking() {
-  const { addNotification, addToCart } = useApp();
+  const { addNotification, addToCart, language } = useApp();
   const [trackingNo, setTrackingNo] = useState("");
   const [loading, setLoading] = useState(false);
   const [order, setOrder] = useState<Order | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [requestReturnMsg, setRequestReturnMsg] = useState("");
+
+  const isAr = language === "ar";
 
   const handleTrackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,11 +30,15 @@ export default function OrderTracking() {
         setOrder(ord);
       } else {
         setOrder(null);
-        setErrorMsg("عذراً، لم نجد أي طلب مسجل بهذا الرقم. يرجى التأكد من كتابة كود التتبع بشكل صحيح (مثال: TAX-123456).");
+        setErrorMsg(
+          isAr 
+            ? "عذراً، لم نجد أي طلب مسجل بهذا الرقم. يرجى التأكد من كتابة كود التتبع بشكل صحيح (مثال: TAX-123456)."
+            : "Sorry, we could not find an order under this code. Make sure you entered it correctly (e.g., TAX-123456)."
+        );
       }
     } catch (err) {
       console.error(err);
-      setErrorMsg("حدث خطأ أثناء البحث عن الطلب.");
+      setErrorMsg(isAr ? "حدث خطأ أثناء البحث عن الطلب." : "An error occurred while tracking the order.");
     } finally {
       setLoading(false);
     }
@@ -42,9 +47,7 @@ export default function OrderTracking() {
   // Reorder functionality
   const handleReorder = () => {
     if (!order) return;
-    // We add all products from this order to the cart again
     order.items.forEach(item => {
-      // Find matching static product details or mock a product schema to insert
       const mockProduct = {
         id: item.id,
         sku: "TS-REORDER",
@@ -67,53 +70,91 @@ export default function OrderTracking() {
       };
       addToCart(mockProduct, item.quantity, item.selectedVariant);
     });
-    addNotification("تم إضافة جميع أصناف الطلب السابق إلى السلة لإعادة الشراء!");
+    addNotification(
+      isAr 
+        ? "تم إضافة جميع أصناف الطلب السابق إلى السلة لإعادة الشراء!"
+        : "All items from the previous order have been added to the cart for re-purchase!"
+    );
   };
 
-  // Return request submission mock
   const handleReturnRequest = () => {
-    setRequestReturnMsg("تم تسجيل طلب الإرجاع/الاستبدال الخاص بك. سيقوم مسؤول علاقات العملاء بالاتصال بك هاتفياً لترتيب استلام الطرد.");
-    addNotification("تم تسجيل طلب الإرجاع بنجاح");
+    setRequestReturnMsg(
+      isAr 
+        ? "تم تسجيل طلب الإرجاع/الاستبدال الخاص بك. سيقوم مسؤول علاقات العملاء بالاتصال بك هاتفياً لترتيب استلام الطرد."
+        : "Your return/exchange request has been logged. Our customer service agent will contact you shortly to coordinate courier pickup."
+    );
+    addNotification(isAr ? "تم تسجيل طلب الإرجاع بنجاح" : "Return request submitted successfully");
   };
 
-  // Determine active step index
-  // pending -> 0, processing -> 1, completed -> 2
   const getStepIndex = (status: Order["status"]) => {
     if (status === "pending") return 0;
     if (status === "processing") return 1;
     if (status === "completed") return 2;
-    return 3; // For cancelled or returned, we will handle accordingly
+    return 3;
   };
 
-  const steps = [
+  const steps = isAr ? [
     { title: "قيد المراجعة", desc: "تم استلام الطلب وتدقيق المقاسات الكنسية", icon: ClipboardList },
     { title: "قيد التجهيز", desc: "جاري تطريز الملابس وصباغة وتجهيز الأثاث", icon: Box },
     { title: "تم الشحن", desc: "تم تسليم الطرد لشركة الشحن وتجهيز بوليصة التوصيل", icon: Truck }
+  ] : [
+    { title: "Under Review", desc: "Order received & sizing specifications verified", icon: ClipboardList },
+    { title: "In Preparation", desc: "Embroidering vestments & crafting metal/woodwork", icon: Box },
+    { title: "Dispatched", desc: "Package handed to courier & waybill printed", icon: Truck }
   ];
 
   const stepIndex = order ? getStepIndex(order.status) : 0;
 
+  // Dictionaries
+  const dict = {
+    title: isAr ? "تتبع حالة طلباتك الكنسية" : "Track Coptic Liturgical Orders",
+    subtitle: isAr
+      ? "أدخل كود تتبع الشحنة المكون من 6 أرقام والموجود في فاتورتك لمراقبة مراحل تطريز ملابسك وصياغة أوانيك."
+      : "Enter the tracking code from your invoice to monitor the tailoring, forging, or carving progress of your order.",
+    inputPlaceholder: isAr ? "مثال: TAX-123456..." : "e.g. TAX-123456...",
+    searchBtn: isAr ? "تتبع الآن" : "Track Now",
+    searching: isAr ? "جاري البحث..." : "Searching...",
+    detailsHeading: (code: string) => isAr ? `تفاصيل الطلب: ${code}` : `Order Details: ${code}`,
+    dateLabel: (date: string) => isAr 
+      ? `تاريخ الإرسال: ${new Date(date).toLocaleString("ar-EG")}`
+      : `Dispatched Date: ${new Date(date).toLocaleString("en-US")}`,
+    statusLabel: isAr ? "الحالة:" : "Status:",
+    statusPending: isAr ? "قيد المراجعة" : "Under Review",
+    statusProcessing: isAr ? "قيد التجهيز والتطريز" : "In Tailoring & Preparation",
+    statusCompleted: isAr ? "تم الشحن والتسليم" : "Shipped & Delivered",
+    statusCancelled: isAr ? "ملغى" : "Cancelled",
+    parcelHeading: isAr ? "تفاصيل الطرد الكنسي المشتراة:" : "Liturgical Package Items Purchased:",
+    qtyLabel: (qty: number, price: number) => isAr ? `الكمية: ${qty} × ${price} ج.م` : `Qty: ${qty} × EGP ${price}`,
+    paymentLabel: isAr ? "طريقة الدفع المحددة:" : "Selected Payment Method:",
+    payCod: isAr ? "الدفع نقدًا عند استلام المندوب" : "Cash on Delivery (COD)",
+    payCard: isAr ? "تحويل إنستاباي / فيزا كارد" : "InstaPay / Visa Card Payment",
+    totalLabel: isAr ? "المبلغ الإجمالي المدفوع:" : "Total Amount Paid:",
+    totalValue: (total: number) => isAr ? `${total} ج.م` : `EGP ${total}`,
+    reorderBtn: isAr ? "إعادة طلب هذه المستلزمات مجدداً" : "Reorder These Items Again",
+    returnBtn: isAr ? "تقديم طلب إرجاع أو استبدال" : "Request Return or Exchange"
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-12 space-y-10">
       
-      {/* Editorial Title */}
+      {/* Title */}
       <div className="text-center space-y-3">
         <h1 className="font-serif text-3xl font-extrabold text-burgundy-800">
-          تتبع حالة طلباتك الكنسية
+          {dict.title}
         </h1>
         <p className="text-sm text-navy-900/60 max-w-md mx-auto leading-relaxed">
-          أدخل كود تتبع الشحنة المكون من 6 أرقام والموجود في فاتورتك لمراقبة مراحل تطريز ملابسك وصياغة أوانيك.
+          {dict.subtitle}
         </p>
       </div>
 
-      {/* Track form */}
+      {/* Form */}
       <div className="bg-white rounded-2xl border border-gold-500/10 p-6 md:p-8 shadow-sm max-w-2xl mx-auto">
-        <form onSubmit={handleTrackSubmit} className="flex flex-col sm:flex-row gap-3">
+        <form onSubmit={handleTrackSubmit} className={`flex flex-col sm:flex-row gap-3 ${isAr ? "" : "flex-row-reverse"}`}>
           <input
             type="text"
             value={trackingNo}
             onChange={(e) => setTrackingNo(e.target.value)}
-            placeholder="مثال: TAX-123456..."
+            placeholder={dict.inputPlaceholder}
             className="flex-grow bg-ivory-200 border border-gold-500/15 rounded-lg p-3 text-sm text-center uppercase font-bold text-burgundy-800 focus:outline-none focus:border-gold-500"
             required
           />
@@ -123,7 +164,7 @@ export default function OrderTracking() {
             className="bg-burgundy-800 hover:bg-burgundy-900 text-gold-300 font-bold px-8 py-3 rounded-lg text-sm border border-gold-500/20 cursor-pointer transition-colors flex items-center justify-center gap-2"
           >
             <Search className="w-4.5 h-4.5" />
-            <span>{loading ? "جاري البحث..." : "تتبع الآن"}</span>
+            <span>{loading ? dict.searching : dict.searchBtn}</span>
           </button>
         </form>
         
@@ -132,36 +173,35 @@ export default function OrderTracking() {
         )}
       </div>
 
-      {/* TRACKING DATA DETAILS VIEW */}
+      {/* Results */}
       {order && (
-        <div className="bg-white rounded-2xl border border-gold-500/15 shadow-xl p-6 md:p-8 space-y-10 text-right animate-fade-in">
+        <div className={`bg-white rounded-2xl border border-gold-500/15 shadow-xl p-6 md:p-8 space-y-10 animate-fade-in ${isAr ? "text-right" : "text-left"}`}>
           
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gold-500/10 pb-4">
+          {/* Result Header */}
+          <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gold-500/10 pb-4 ${isAr ? "" : "flex-row-reverse"}`}>
             <div>
-              <h3 className="font-bold text-sm text-navy-950">تفاصيل الطلب: {order.tracking_number}</h3>
-              <p className="text-[10px] text-navy-900/40 mt-0.5">تاريخ الإرسال: {new Date(order.created_at).toLocaleString("ar-EG")}</p>
+              <h3 className="font-bold text-sm text-navy-950">{dict.detailsHeading(order.tracking_number)}</h3>
+              <p className="text-[10px] text-navy-900/40 mt-0.5">{dict.dateLabel(order.created_at)}</p>
             </div>
-            <div className="text-left">
+            <div className={isAr ? "text-left" : "text-right"}>
               <span className={`inline-block font-bold text-xs px-3 py-1 rounded ${
                 order.status === "completed" ? "bg-green-100 text-green-700" :
                 order.status === "processing" ? "bg-blue-100 text-blue-700" :
                 order.status === "cancelled" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
               }`}>
-                الحالة: {
-                  order.status === "pending" ? "قيد المراجعة" :
-                  order.status === "processing" ? "قيد التجهيز والتطريز" :
-                  order.status === "completed" ? "تم الشحن والتسليم" : "ملغى"
+                {dict.statusLabel} {
+                  order.status === "pending" ? dict.statusPending :
+                  order.status === "processing" ? dict.statusProcessing :
+                  order.status === "completed" ? dict.statusCompleted : dict.statusCancelled
                 }
               </span>
             </div>
           </div>
 
-          {/* Visual Timeline Steps progress */}
+          {/* Timeline */}
           {order.status !== "cancelled" && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative pt-4">
-              
-              {/* Horizontal linking line in desktop */}
+            <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 relative pt-4 ${isAr ? "" : "flex-row-reverse"}`}>
+              {/* Linked Line */}
               <div className="hidden md:block absolute top-[44px] right-[16.6%] left-[16.6%] h-1 bg-gold-500/10 z-0">
                 <div 
                   className="bg-gold-500 h-full transition-all duration-500" 
@@ -171,12 +211,11 @@ export default function OrderTracking() {
 
               {steps.map((step, idx) => {
                 const Icon = step.icon;
-                const isCompleted = idx <= stepIndex;
-                const isActive = idx === stepIndex;
+                const isCompleted = isAr ? (idx <= stepIndex) : ((2 - idx) <= stepIndex);
+                const isActive = isAr ? (idx === stepIndex) : ((2 - idx) === stepIndex);
 
                 return (
                   <div key={idx} className="flex flex-col items-center text-center relative z-10 space-y-2.5">
-                    {/* Circle Icon */}
                     <div className={`w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all ${
                       isCompleted 
                         ? "bg-burgundy-800 border-gold-500 text-gold-300 shadow-md" 
@@ -198,52 +237,49 @@ export default function OrderTracking() {
             </div>
           )}
 
-          {/* Ordered items details */}
+          {/* Table summary */}
           <div className="border-t border-gold-500/10 pt-6 space-y-4">
-            <h4 className="font-bold text-xs text-burgundy-800">تفاصيل الطرد الكنسي المشتراة:</h4>
+            <h4 className="font-bold text-xs text-burgundy-800">{dict.parcelHeading}</h4>
             
             <div className="space-y-3">
               {order.items.map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center py-2 border-b border-dashed border-gold-500/5 text-xs">
-                  <div>
-                    <span className="font-semibold text-navy-900">{item.name_ar}</span>
+                <div key={idx} className={`flex justify-between items-center py-2 border-b border-dashed border-gold-500/5 text-xs ${isAr ? "" : "flex-row-reverse"}`}>
+                  <div className={isAr ? "text-right" : "text-left"}>
+                    <span className="font-semibold text-navy-900">{isAr ? item.name_ar : item.name_en}</span>
                     {item.selectedVariant && (
                       <span className="block text-[10px] text-gold-600 font-bold mt-0.5">({item.selectedVariant})</span>
                     )}
                   </div>
-                  <span className="font-bold text-navy-900/70">الكمية: {item.quantity} × {item.price} ج.م</span>
+                  <span className="font-bold text-navy-900/70">{dict.qtyLabel(item.quantity, item.price)}</span>
                 </div>
               ))}
             </div>
 
-            <div className="flex justify-between text-xs text-navy-900/60 pt-2 border-t border-gold-500/5">
-              <span>طريقة الدفع المحددة:</span>
+            <div className={`flex justify-between text-xs text-navy-900/60 pt-2 border-t border-gold-500/5 ${isAr ? "" : "flex-row-reverse"}`}>
+              <span>{dict.paymentLabel}</span>
               <span className="font-bold text-navy-950">
-                {order.payment_method === "cod" ? "الدفع نقدًا عند استلام المندوب" : "تحويل إنستاباي / فيزا كارد"}
+                {order.payment_method === "cod" ? dict.payCod : dict.payCard}
               </span>
             </div>
 
-            <div className="flex justify-between text-sm font-bold text-burgundy-800">
-              <span>المبلغ الإجمالي المدفوع:</span>
-              <span>{order.total} ج.م</span>
+            <div className={`flex justify-between text-sm font-bold text-burgundy-800 ${isAr ? "" : "flex-row-reverse"}`}>
+              <span>{dict.totalLabel}</span>
+              <span>{dict.totalValue(order.total)}</span>
             </div>
           </div>
 
-          {/* Reorder / Return widgets */}
-          <div className="border-t border-gold-500/10 pt-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
-            
-            {/* Reorder */}
+          {/* Action trigger widgets */}
+          <div className={`border-t border-gold-500/10 pt-6 flex flex-col sm:flex-row gap-4 justify-between items-center ${isAr ? "" : "flex-row-reverse"}`}>
             <button
               onClick={handleReorder}
               className="bg-burgundy-800 hover:bg-burgundy-900 text-gold-300 font-bold py-2.5 px-6 rounded-lg text-xs flex items-center gap-1.5 transition-all shadow cursor-pointer border border-gold-500/30"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>إعادة طلب هذه المستلزمات مجدداً</span>
+              <span>{dict.reorderBtn}</span>
             </button>
 
-            {/* Return Request */}
             {order.status === "completed" && (
-              <div className="flex flex-col items-end gap-2">
+              <div className={`flex flex-col ${isAr ? "items-end" : "items-start"} gap-2`}>
                 {requestReturnMsg ? (
                   <p className="text-[10px] font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded border border-green-500/10">
                     {requestReturnMsg}
@@ -253,12 +289,11 @@ export default function OrderTracking() {
                     onClick={handleReturnRequest}
                     className="text-xs font-bold text-red-600 hover:underline border border-dashed border-red-500/20 rounded px-4 py-2 hover:bg-red-50 transition-all cursor-pointer"
                   >
-                    تقديم طلب إرجاع أو استبدال
+                    {dict.returnBtn}
                   </button>
                 )}
               </div>
             )}
-
           </div>
 
         </div>

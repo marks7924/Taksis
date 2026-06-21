@@ -1,12 +1,18 @@
 "use client";
 
 import React from "react";
+import { useApp } from "@/services/store";
 
 export default function WhatsAppCTA() {
+  const { language } = useApp();
+  const isAr = language === "ar";
+
   const phoneNumber = "201220201204"; // Egypt country code + phone
-  const message = encodeURIComponent(
-    "سلام ونعمة، أود الاستفسار عن مستلزمات كنسية من معرض طاكسيس."
-  );
+  
+  const arMsg = "سلام ونعمة، أود الاستفسار عن مستلزمات كنسية من معرض طاكسيس.";
+  const enMsg = "Hello and blessings, I would like to inquire about church supplies from Taxsis.";
+  
+  const message = encodeURIComponent(isAr ? arMsg : enMsg);
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
 
   return (
@@ -14,11 +20,11 @@ export default function WhatsAppCTA() {
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 left-6 z-50 flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-500 text-white px-4 py-3 rounded-full shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-gold-500/80 group"
-      aria-label="تواصل معنا عبر واتساب"
+      className="fixed bottom-6 left-6 z-50 flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-500 text-white px-4 py-3 rounded-full shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-gold-500/80 group shrink-0"
+      aria-label={isAr ? "تواصل معنا عبر واتساب" : "Contact us on WhatsApp"}
     >
       <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 ease-out whitespace-nowrap font-medium text-sm">
-        تواصل معنا واتساب
+        {isAr ? "تواصل معنا واتساب" : "WhatsApp Chat"}
       </span>
       <svg
         className="w-6 h-6 fill-current"

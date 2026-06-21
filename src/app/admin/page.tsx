@@ -19,7 +19,8 @@ import { Product, Category } from "@/services/db-mock-data";
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const { currentUser, addNotification } = useApp();
+  const { currentUser, addNotification, language, refreshData } = useApp();
+  const isAr = language === "ar";
 
   // Redirect non-admins in real app, but keep it accessible for mock testing easily
   useEffect(() => {
@@ -139,7 +140,8 @@ export default function AdminDashboard() {
       });
       addNotification(formId ? "تم تعديل صنف المنتج بنجاح" : "تم إضافة صنف كنسي جديد بنجاح");
       setShowProductForm(false);
-      loadDatabase();
+      await loadDatabase();
+      await refreshData();
     } catch (err) {
       console.error(err);
       alert("حدث خطأ أثناء حفظ المنتج");
@@ -151,7 +153,8 @@ export default function AdminDashboard() {
     try {
       await deleteProduct(id);
       addNotification("تم حذف المنتج بنجاح");
-      loadDatabase();
+      await loadDatabase();
+      await refreshData();
     } catch (err) {
       console.error(err);
     }
@@ -188,7 +191,8 @@ export default function AdminDashboard() {
       });
       addNotification(catFormId ? "تم تعديل القسم الكنسي بنجاح" : "تم إضافة قسم كنسي جديد بنجاح");
       setShowCategoryForm(false);
-      loadDatabase();
+      await loadDatabase();
+      await refreshData();
     } catch (err) {
       console.error(err);
       alert("حدث خطأ أثناء حفظ القسم");
@@ -200,7 +204,8 @@ export default function AdminDashboard() {
     try {
       await deleteCategory(id);
       addNotification("تم حذف القسم الكنسي بنجاح");
-      loadDatabase();
+      await loadDatabase();
+      await refreshData();
     } catch (err) {
       console.error(err);
     }
@@ -238,74 +243,163 @@ export default function AdminDashboard() {
   const pendingOrdersCount = orders.filter(o => o.status === "pending").length;
   const openCustomsCount = customs.filter(c => c.status === "pending").length;
 
+  // Dynamic Dictionaries
+  const dict = {
+    loading: isAr ? "جاري تحميل لوحة التحكم للمشرف..." : "Loading admin control panel...",
+    sysBadge: isAr ? "نظام إدارة طاكسيس المعتمد" : "Taxsis Authorized Management System",
+    title: isAr ? "لوحة الإدارة والمشرفين" : "Admin & Supervisor Dashboard",
+    syncBtn: isAr ? "تحديث لوحة البيانات دقيقة بدقيقة" : "Live Sync Dashboard Data",
+    tabOverview: isAr ? "نظرة عامة والتحليلات" : "Overview & Analytics",
+    tabProducts: isAr ? "المخزون والمنتجات" : "Products & Stock",
+    tabCategories: isAr ? "الأقسام والكاتيجوريز" : "Liturgical Categories",
+    tabOrders: isAr ? "الطلبات والمبيعات" : "Orders & Sales",
+    tabCustoms: isAr ? "طلبات التفصيل المخصصة" : "Bespoke Requests",
+    metricSales: isAr ? "إجمالي المبيعات المكتملة" : "Total Completed Sales",
+    metricPending: isAr ? "الطلبات قيد المراجعة" : "Orders Pending Review",
+    metricLowStock: isAr ? "أصناف منخفضة المخزون" : "Low Stock Products",
+    metricCustoms: isAr ? "طلبات التفصيل المفتوحة" : "Open Bespoke Requests",
+    warningTitle: isAr ? "تحذير: منتجات شارفت كميتها على النفاد (أقل من 5 قطع)" : "Warning: Products running low on stock (under 5 pcs)",
+    remaining: isAr ? "متبقي:" : "Remaining:",
+    pcs: isAr ? "قطع" : "pcs",
+    activityLog: isAr ? "سجل النشاط والأحداث البرمجية" : "Activity Audit & Event Logs",
+    dbSuccessMsg: isAr ? "تحديث ناجح لقاعدة البيانات الملحية للـ JSON DB." : "Successfully updated JSON DB database snapshot.",
+    coordSuccessMsg: isAr ? "مسؤول المقاسات بطاكسيس قام بمطابقة جدول المقاسات للكهنة." : "Taxsis sizing coordinator aligned priest measurement guidelines.",
+    newOrderMsg: (track: string, name: string) => isAr 
+      ? `إنشاء طلب جديد بنجاح بكود تتبع: ${track} لصالح العميل ${name}.`
+      : `New order created successfully with tracking: ${track} for client ${name}.`,
+    prodHeading: isAr ? "قائمة أصناف المعرض" : "Exhibition Catalog Items",
+    prodAddBtn: isAr ? "إضافة صنف كنسي جديد" : "Add New Product",
+    formEditTitle: isAr ? "تعديل بيانات الصنف" : "Edit Product Details",
+    formAddTitle: isAr ? "إضافة صنف منتج جديد للمعرض" : "Add New Product to Exhibition",
+    formSku: isAr ? "كود الـ SKU:" : "SKU Code:",
+    formSkuPlaceholder: isAr ? "تلقائي إن تُرِك فارغاً" : "Auto-generated if empty",
+    formNameAr: isAr ? "الاسم بالعربية:" : "Arabic Name:",
+    formNameEn: isAr ? "الاسم بالإنجليزية:" : "English Name:",
+    formPrice: isAr ? "سعر البيع الأساسي (ج.م):" : "Base Selling Price (EGP):",
+    formDiscount: isAr ? "سعر الخصم الترويجي (اختياري):" : "Promo Discount Price (Optional):",
+    formStock: isAr ? "الكمية المتوفرة بالمخزن:" : "Available Stock Quantity:",
+    formCategory: isAr ? "القسم الكنسي التابع له:" : "Liturgical Category:",
+    formDescAr: isAr ? "شرح الصنف بالعربية:" : "Arabic Description:",
+    formDescEn: isAr ? "شرح الصنف بالإنجليزية:" : "English Description:",
+    formImages: isAr ? "روابط الصور (رابط مباشر أو روابط تفصلها فواصل للصور المتعددة):" : "Image URLs (comma-separated for multiple images):",
+    formImagesDesc: isAr ? "يمكنك إدخال رابط أو عدة روابط صور مفصولة بفواصل لجعل المعرض متحركاً." : "You can enter one or multiple image links separated by commas.",
+    formCancel: isAr ? "إلغاء والعودة" : "Cancel & Return",
+    formSave: isAr ? "حفظ وتأكيد التخزين" : "Save & Confirm Stock",
+    tableSku: isAr ? "رمز SKU" : "SKU Code",
+    tableName: isAr ? "اسم المنتج" : "Product Name",
+    tableCategory: isAr ? "القسم الكنسي" : "Category",
+    tablePrice: isAr ? "السعر أساسي/خصم" : "Base/Discount",
+    tableStock: isAr ? "المخزون" : "Stock Status",
+    tableAction: isAr ? "التحكم" : "Action",
+    deleteConfirm: isAr ? "هل أنت متأكد من حذف هذا المنتج نهائياً من المعرض؟" : "Are you sure you want to permanently delete this product from the exhibition?",
+    catHeading: isAr ? "إدارة الأقسام والكاتيجوريز الكنسية" : "Manage Liturgical Categories",
+    catAddBtn: isAr ? "إضافة قسم كنسي جديد" : "Add New Category",
+    catFormEdit: isAr ? "تعديل بيانات القسم الكنسي" : "Edit Category Details",
+    catFormAdd: isAr ? "إضافة قسم كنسي جديد" : "Add New Liturgical Category",
+    catFormNameAr: isAr ? "اسم القسم بالعربية:" : "Category Arabic Name:",
+    catFormNameEn: isAr ? "اسم القسم بالإنجليزية:" : "Category English Name:",
+    catFormSlug: isAr ? "Slug (الرمز المميز في الرابط):" : "Slug Key (URL identifier):",
+    catFormImage: isAr ? "رابط صورة القسم:" : "Category Image URL:",
+    catCancel: isAr ? "إلغاء والعودة" : "Cancel & Return",
+    catSave: isAr ? "حفظ وتأكيد القسم" : "Save & Confirm Category",
+    catTableImg: isAr ? "صورة القسم" : "Image",
+    catTableAr: isAr ? "الاسم بالعربية" : "Arabic Name",
+    catTableEn: isAr ? "الاسم بالإنجليزية" : "English Name",
+    catTableSlug: isAr ? "الرمز Slug" : "Slug Key",
+    catDeleteConfirm: isAr ? "هل أنت متأكد من حذف هذا القسم؟ سيتم نقل المنتجات المرتبطة به لقسم 'منتجات أخرى'." : "Are you sure you want to delete this category? Associated products will be moved to 'Other Products'.",
+    orderHeading: isAr ? "إدارة طلبات ومبيعات العملاء" : "Manage Client Orders & Sales",
+    orderTableTrack: isAr ? "رقم التتبع" : "Tracking No.",
+    orderTableCustomer: isAr ? "اسم المستلم والهاتف" : "Customer & Phone",
+    orderTableDate: isAr ? "تاريخ الطلب" : "Order Date",
+    orderTableTotal: isAr ? "السعر الكلي" : "Total Price",
+    orderTableStatus: isAr ? "حالة الدفع/الطلب" : "Status & Payment",
+    orderTableAction: isAr ? "تحديث الحالة" : "Update Status",
+    orderEmpty: isAr ? "لا توجد أي مبيعات أو طلبات مسجلة بعد." : "No client sales or orders recorded yet.",
+    orderStatusPending: isAr ? "قيد المراجعة" : "Pending Review",
+    orderStatusProcessing: isAr ? "قيد التجهيز" : "In Preparation",
+    orderStatusCompleted: isAr ? "تم الشحن" : "Dispatched",
+    orderPaid: isAr ? "مدفوع" : "Paid",
+    orderUnpaid: isAr ? "غير مدفوع بعد" : "Unpaid",
+    orderActionProcess: isAr ? "تجهيز" : "Prepare",
+    orderActionShip: isAr ? "شحن/أنجز" : "Ship/Complete",
+    customHeading: isAr ? "صندوق الوارد لطلبات التفصيل والأعمال الخشبية المحفورة بالطلب" : "Bespoke & Liturgical Custom Requests Inbox",
+    customEmpty: isAr ? "لا توجد طلبات تفصيل أو حفر خشب مخصصة حتى الآن." : "No custom sizing or wood carving requests received yet.",
+    customStatusQuoted: (amt: number) => isAr ? `تم التسعير بـ ${amt} ج.م` : `Quoted at EGP ${amt}`,
+    customStatusPending: isAr ? "بانتظار عرض السعر" : "Awaiting Quote Price",
+    customQuotePlaceholder: isAr ? "المبلغ الإجمالي بالجنيه..." : "Total quote in EGP...",
+    customQuoteConfirm: isAr ? "تأكيد السعر" : "Confirm Price",
+    customQuoteCancel: isAr ? "إلغاء" : "Cancel",
+    customQuoteBtn: isAr ? "تحديد وعرض السعر المالي للعميل" : "Specify Quote & Offer to Client"
+  };
+
   if (loading) {
-    return <div className="text-center py-24 font-bold text-sm">جاري تحميل لوحة التحكم للمشرف...</div>;
+    return <div className="text-center py-24 font-bold text-sm">{dict.loading}</div>;
   }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
       
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gold-500/15 pb-6">
-        <div>
-          <div className="flex items-center gap-2 text-gold-600 font-bold">
+      <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gold-500/15 pb-6 ${isAr ? "" : "flex-row-reverse"}`}>
+        <div className={isAr ? "text-right" : "text-left"}>
+          <div className={`flex items-center gap-2 text-gold-600 font-bold ${isAr ? "" : "flex-row-reverse"}`}>
             <ShieldAlert className="w-5 h-5 text-gold-500" />
-            <span>نظام إدارة طاكسيس المعتمد</span>
+            <span>{dict.sysBadge}</span>
           </div>
           <h1 className="font-serif text-3xl font-extrabold text-burgundy-800 mt-1">
-            لوحة الإدارة والمشرفين
+            {dict.title}
           </h1>
         </div>
 
         {/* Quick Database seed trigger */}
         <button
           onClick={loadDatabase}
-          className="bg-ivory-200 text-burgundy-800 font-bold border border-gold-500/20 px-4 py-2.5 rounded-lg text-xs hover:bg-gold-500/10 transition-colors"
+          className="bg-ivory-200 text-burgundy-800 font-bold border border-gold-500/20 px-4 py-2.5 rounded-lg text-xs hover:bg-gold-500/10 transition-colors cursor-pointer"
         >
-          تحديث لوحة البيانات دقيقة بدقيقة
+          {dict.syncBtn}
         </button>
       </div>
 
       {/* Main Tab Controls Row */}
-      <div className="flex flex-wrap gap-2 border-b border-gold-500/10 pb-1">
+      <div className={`flex flex-wrap gap-2 border-b border-gold-500/10 pb-1 ${isAr ? "" : "flex-row-reverse"}`}>
         <button
           onClick={() => setActiveTab("overview")}
-          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${isAr ? "flex-row" : "flex-row-reverse"} ${
             activeTab === "overview" ? "bg-burgundy-800 text-gold-300 shadow" : "text-navy-800 hover:bg-gold-500/10"
           }`}
         >
           <LayoutDashboard className="w-4.5 h-4.5" />
-          <span>نظرة عامة والتحليلات</span>
+          <span>{dict.tabOverview}</span>
         </button>
 
         <button
           onClick={() => setActiveTab("products")}
-          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${isAr ? "flex-row" : "flex-row-reverse"} ${
             activeTab === "products" ? "bg-burgundy-800 text-gold-300 shadow" : "text-navy-800 hover:bg-gold-500/10"
           }`}
         >
           <Package className="w-4.5 h-4.5" />
-          <span>المخزون والمنتجات ({products.length})</span>
+          <span>{dict.tabProducts} ({products.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab("categories")}
-          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${isAr ? "flex-row" : "flex-row-reverse"} ${
             activeTab === "categories" ? "bg-burgundy-800 text-gold-300 shadow" : "text-navy-800 hover:bg-gold-500/10"
           }`}
         >
           <Settings className="w-4.5 h-4.5" />
-          <span>الأقسام والكاتيجوريز ({categories.length})</span>
+          <span>{dict.tabCategories} ({categories.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab("orders")}
-          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${isAr ? "flex-row" : "flex-row-reverse"} ${
             activeTab === "orders" ? "bg-burgundy-800 text-gold-300 shadow" : "text-navy-800 hover:bg-gold-500/10"
           }`}
         >
           <ShoppingCart className="w-4.5 h-4.5" />
-          <span>الطلبات والمبيعات ({orders.length})</span>
+          <span>{dict.tabOrders} ({orders.length})</span>
           {pendingOrdersCount > 0 && (
             <span className="bg-red-600 text-white font-bold text-[9px] w-4.5 h-4.5 rounded-full flex items-center justify-center border border-white">
               {pendingOrdersCount}
@@ -315,12 +409,12 @@ export default function AdminDashboard() {
 
         <button
           onClick={() => setActiveTab("customs")}
-          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-5 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${isAr ? "flex-row" : "flex-row-reverse"} ${
             activeTab === "customs" ? "bg-burgundy-800 text-gold-300 shadow" : "text-navy-800 hover:bg-gold-500/10"
           }`}
         >
           <FileText className="w-4.5 h-4.5" />
-          <span>طلبات التفصيل المخصصة ({customs.length})</span>
+          <span>{dict.tabCustoms} ({customs.length})</span>
           {openCustomsCount > 0 && (
             <span className="bg-gold-500 text-burgundy-900 font-bold text-[9px] w-4.5 h-4.5 rounded-full flex items-center justify-center border border-white">
               {openCustomsCount}
@@ -333,51 +427,51 @@ export default function AdminDashboard() {
       
       {/* TAB 1: OVERVIEW METRICS */}
       {activeTab === "overview" && (
-        <div className="space-y-8 animate-fade-in">
+        <div className="space-y-8 animate-fade-in text-xs text-navy-950">
           {/* Dashboard Summary cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Metric 1 */}
-            <div className="bg-white rounded-2xl border border-gold-500/10 p-6 shadow-sm flex items-center gap-4">
+            <div className={`bg-white rounded-2xl border border-gold-500/10 p-6 shadow-sm flex items-center gap-4 ${isAr ? "" : "flex-row-reverse"}`}>
               <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center">
                 <DollarSign className="w-6 h-6" />
               </div>
-              <div className="space-y-0.5">
-                <p className="text-[10px] font-bold text-navy-900/40">إجمالي المبيعات المكتملة</p>
-                <h3 className="font-bold text-lg text-burgundy-800">{totalSales} ج.م</h3>
+              <div className={`space-y-0.5 ${isAr ? "text-right" : "text-left"}`}>
+                <p className="text-[10px] font-bold text-navy-900/40">{dict.metricSales}</p>
+                <h3 className="font-bold text-lg text-burgundy-800">{totalSales} {isAr ? "ج.م" : "EGP"}</h3>
               </div>
             </div>
 
             {/* Metric 2 */}
-            <div className="bg-white rounded-2xl border border-gold-500/10 p-6 shadow-sm flex items-center gap-4">
+            <div className={`bg-white rounded-2xl border border-gold-500/10 p-6 shadow-sm flex items-center gap-4 ${isAr ? "" : "flex-row-reverse"}`}>
               <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center">
                 <ShoppingCart className="w-6 h-6" />
               </div>
-              <div className="space-y-0.5">
-                <p className="text-[10px] font-bold text-navy-900/40">الطلبات قيد المراجعة</p>
-                <h3 className="font-bold text-lg text-burgundy-800">{pendingOrdersCount} طلبات</h3>
+              <div className={`space-y-0.5 ${isAr ? "text-right" : "text-left"}`}>
+                <p className="text-[10px] font-bold text-navy-900/40">{dict.metricPending}</p>
+                <h3 className="font-bold text-lg text-burgundy-800">{pendingOrdersCount} {isAr ? "طلبات" : "orders"}</h3>
               </div>
             </div>
 
             {/* Metric 3 */}
-            <div className="bg-white rounded-2xl border border-gold-500/10 p-6 shadow-sm flex items-center gap-4">
+            <div className={`bg-white rounded-2xl border border-gold-500/10 p-6 shadow-sm flex items-center gap-4 ${isAr ? "" : "flex-row-reverse"}`}>
               <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center">
                 <AlertCircle className="w-6 h-6" />
               </div>
-              <div className="space-y-0.5">
-                <p className="text-[10px] font-bold text-navy-900/40">أصناف منخفضة المخزون</p>
-                <h3 className="font-bold text-lg text-burgundy-800">{lowStockCount} منتجات</h3>
+              <div className={`space-y-0.5 ${isAr ? "text-right" : "text-left"}`}>
+                <p className="text-[10px] font-bold text-navy-900/40">{dict.metricLowStock}</p>
+                <h3 className="font-bold text-lg text-burgundy-800">{lowStockCount} {isAr ? "منتجات" : "products"}</h3>
               </div>
             </div>
 
             {/* Metric 4 */}
-            <div className="bg-white rounded-2xl border border-gold-500/10 p-6 shadow-sm flex items-center gap-4">
+            <div className={`bg-white rounded-2xl border border-gold-500/10 p-6 shadow-sm flex items-center gap-4 ${isAr ? "" : "flex-row-reverse"}`}>
               <div className="w-12 h-12 bg-gold-500/10 text-gold-600 rounded-full flex items-center justify-center">
                 <MessageCircle className="w-6 h-6" />
               </div>
-              <div className="space-y-0.5">
-                <p className="text-[10px] font-bold text-navy-900/40">طلبات التفصيل المفتوحة</p>
-                <h3 className="font-bold text-lg text-burgundy-800">{openCustomsCount} طلبات</h3>
+              <div className={`space-y-0.5 ${isAr ? "text-right" : "text-left"}`}>
+                <p className="text-[10px] font-bold text-navy-900/40">{dict.metricCustoms}</p>
+                <h3 className="font-bold text-lg text-burgundy-800">{openCustomsCount} {isAr ? "طلبات" : "requests"}</h3>
               </div>
             </div>
 
@@ -386,19 +480,19 @@ export default function AdminDashboard() {
           {/* Low Stock Alerts list */}
           {lowStockCount > 0 && (
             <div className="bg-red-50 border border-red-500/15 rounded-2xl p-6 space-y-4">
-              <h3 className="font-serif text-sm font-bold text-red-700 flex items-center gap-1.5">
+              <h3 className={`font-serif text-sm font-bold text-red-700 flex items-center gap-1.5 ${isAr ? "" : "flex-row-reverse"}`}>
                 <AlertCircle className="w-5 h-5 shrink-0" />
-                تحذير: منتجات شارفت كميتها على النفاد (أقل من 5 قطع)
+                {dict.warningTitle}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                 {products.filter(p => p.stock_quantity <= 4).map(prod => (
-                  <div key={prod.id} className="bg-white border rounded-lg p-3 flex justify-between items-center shadow-sm">
-                    <div>
-                      <p className="font-bold text-navy-900">{prod.name_ar}</p>
-                      <p className="text-[10px] text-navy-900/40 mt-0.5">كود: {prod.sku}</p>
+                  <div key={prod.id} className={`bg-white border rounded-lg p-3 flex justify-between items-center shadow-sm ${isAr ? "" : "flex-row-reverse"}`}>
+                    <div className={isAr ? "text-right" : "text-left"}>
+                      <p className="font-bold text-navy-900">{isAr ? prod.name_ar : prod.name_en}</p>
+                      <p className="text-[10px] text-navy-900/40 mt-0.5">{isAr ? "كود:" : "SKU:"} {prod.sku}</p>
                     </div>
                     <span className="font-bold bg-red-100 text-red-800 px-3 py-1 rounded">
-                      متبقي: {prod.stock_quantity} قطع
+                      {dict.remaining} {prod.stock_quantity} {dict.pcs}
                     </span>
                   </div>
                 ))}
@@ -407,22 +501,22 @@ export default function AdminDashboard() {
           )}
 
           {/* Activity audit log logs */}
-          <div className="bg-white rounded-2xl border border-gold-500/10 p-6 shadow-sm space-y-4">
-            <h3 className="font-serif text-base font-bold text-burgundy-800">سجل النشاط والأحداث البرمجية</h3>
+          <div className={`bg-white rounded-2xl border border-gold-500/10 p-6 shadow-sm space-y-4 ${isAr ? "text-right" : "text-left"}`}>
+            <h3 className="font-serif text-base font-bold text-burgundy-800">{dict.activityLog}</h3>
             
             <div className="space-y-3 text-xs leading-normal pr-1 max-h-60 overflow-y-auto">
-              <div className="p-3 border-r-4 border-green-500 bg-green-50/50 rounded flex justify-between items-center">
-                <span>تحديث ناجح لقاعدة البيانات الملحية للـ JSON DB.</span>
-                <span className="text-[9px] text-navy-900/40">الآن</span>
+              <div className={`p-3 border-r-4 border-gold-600 bg-gold-50/50 rounded flex justify-between items-center ${isAr ? "" : "flex-row-reverse"}`}>
+                <span>{dict.dbSuccessMsg}</span>
+                <span className="text-[9px] text-navy-900/40">{isAr ? "الآن" : "now"}</span>
               </div>
-              <div className="p-3 border-r-4 border-gold-500 bg-gold-50/50 rounded flex justify-between items-center">
-                <span>مسؤول المقاسات بطاكسيس قام بمطابقة جدول المقاسات للكهنة.</span>
-                <span className="text-[9px] text-navy-900/40">منذ ساعة</span>
+              <div className={`p-3 border-r-4 border-gold-500 bg-gold-50/50 rounded flex justify-between items-center ${isAr ? "" : "flex-row-reverse"}`}>
+                <span>{dict.coordSuccessMsg}</span>
+                <span className="text-[9px] text-navy-900/40">{isAr ? "منذ ساعة" : "1h ago"}</span>
               </div>
               {orders.slice(0, 3).map(o => (
-                <div key={o.id} className="p-3 border-r-4 border-blue-500 bg-blue-50/50 rounded flex justify-between items-center">
-                  <span>إنشاء طلب جديد بنجاح بكود تتبع: {o.tracking_number} لصالح العميل {o.shipping_address.fullName}.</span>
-                  <span className="text-[9px] text-navy-900/40">{new Date(o.created_at).toLocaleTimeString("ar-EG")}</span>
+                <div key={o.id} className={`p-3 border-r-4 border-blue-500 bg-blue-50/50 rounded flex justify-between items-center ${isAr ? "" : "flex-row-reverse"}`}>
+                  <span>{dict.newOrderMsg(o.tracking_number, o.shipping_address.fullName)}</span>
+                  <span className="text-[9px] text-navy-900/40">{new Date(o.created_at).toLocaleTimeString(isAr ? "ar-EG" : "en-US")}</span>
                 </div>
               ))}
             </div>
@@ -432,138 +526,138 @@ export default function AdminDashboard() {
 
       {/* TAB 2: PRODUCT CRUD MANAGEMENT */}
       {activeTab === "products" && (
-        <div className="space-y-6 animate-fade-in">
+        <div className="space-y-6 animate-fade-in text-xs text-navy-950">
           
-          <div className="flex justify-between items-center">
-            <h3 className="font-serif text-base font-bold text-burgundy-800">قائمة أصناف المعرض</h3>
+          <div className={`flex justify-between items-center ${isAr ? "" : "flex-row-reverse"}`}>
+            <h3 className="font-serif text-base font-bold text-burgundy-800">{dict.prodHeading}</h3>
             <button
               onClick={handleOpenAddProduct}
               className="bg-gold-500 hover:bg-gold-600 text-burgundy-900 font-extrabold px-4 py-2.5 rounded-lg text-xs border border-gold-400 cursor-pointer flex items-center gap-1"
             >
               <Plus className="w-4 h-4" />
-              <span>إضافة صنف كنسي جديد</span>
+              <span>{dict.prodAddBtn}</span>
             </button>
           </div>
 
           {/* Product form toggle dialog inline */}
           {showProductForm && (
             <div className="bg-ivory-200 border-2 border-gold-500/25 p-6 rounded-2xl shadow-lg animate-fade-in text-xs text-navy-950">
-              <form onSubmit={handleProductSubmit} className="space-y-6">
+              <form onSubmit={handleProductSubmit} className={`space-y-6 ${isAr ? "text-right" : "text-left"}`}>
                 <h4 className="font-serif text-sm font-bold text-burgundy-800 border-b border-gold-500/10 pb-2 mb-4">
-                  {formId ? "تعديل بيانات الصنف" : "إضافة صنف منتج جديد للمعرض"}
+                  {formId ? dict.formEditTitle : dict.formAddTitle}
                 </h4>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                   <div className="space-y-1">
-                    <label className="font-bold">كود الـ SKU:</label>
+                    <label className="font-bold">{dict.formSku}</label>
                     <input
                       type="text"
                       value={formSku}
                       onChange={(e) => setFormSku(e.target.value)}
-                      placeholder="تلقائي إن تُرِك فارغاً"
-                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                      placeholder={dict.formSkuPlaceholder}
+                      className={`w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none ${isAr ? "text-right" : "text-left"}`}
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-bold">الاسم بالعربية:</label>
+                    <label className="font-bold">{dict.formNameAr}</label>
                     <input
                       type="text"
                       value={formNameAr}
                       onChange={(e) => setFormNameAr(e.target.value)}
                       placeholder="دف كنسي نحاسي..."
-                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none text-right"
                       required
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-bold">الاسم بالإنجليزية:</label>
+                    <label className="font-bold">{dict.formNameEn}</label>
                     <input
                       type="text"
                       value={formNameEn}
                       onChange={(e) => setFormNameEn(e.target.value)}
                       placeholder="Coptic Cymbals..."
-                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none text-left"
                       required
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-bold">سعر البيع الأساسي (ج.م):</label>
+                    <label className="font-bold">{dict.formPrice}</label>
                     <input
                       type="number"
                       value={formPrice}
                       onChange={(e) => setFormPrice(e.target.value)}
                       placeholder="1800"
-                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                      className={`w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none ${isAr ? "text-right" : "text-left"}`}
                       required
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-bold">سعر الخصم الترويجي (اختياري):</label>
+                    <label className="font-bold">{dict.formDiscount}</label>
                     <input
                       type="number"
                       value={formDiscount}
                       onChange={(e) => setFormDiscount(e.target.value)}
                       placeholder="1600"
-                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                      className={`w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none ${isAr ? "text-right" : "text-left"}`}
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-bold">الكمية المتوفرة بالمخزن:</label>
+                    <label className="font-bold">{dict.formStock}</label>
                     <input
                       type="number"
                       value={formStock}
                       onChange={(e) => setFormStock(e.target.value)}
                       placeholder="15"
-                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                      className={`w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none ${isAr ? "text-right" : "text-left"}`}
                       required
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-bold">القسم الكنسي التابع له:</label>
+                    <label className="font-bold block">{dict.formCategory}</label>
                     <select
                       value={formCategory}
                       onChange={(e) => setFormCategory(e.target.value)}
-                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none text-right font-semibold"
+                      className={`w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none font-semibold ${isAr ? "text-right" : "text-left"}`}
                     >
                       {categories.map(c => (
-                        <option key={c.id} value={c.id}>{c.name_ar}</option>
+                        <option key={c.id} value={c.id}>{isAr ? c.name_ar : c.name_en}</option>
                       ))}
                     </select>
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-bold">شرح الصنف بالعربية:</label>
+                  <label className="font-bold">{dict.formDescAr}</label>
                   <textarea
                     value={formDescAr}
                     onChange={(e) => setFormDescAr(e.target.value)}
                     placeholder="تفاصيل دقيقة عن الصنف الطقسي..."
                     rows={2}
-                    className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                    className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none text-right"
                     required
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-bold">شرح الصنف بالإنجليزية:</label>
+                  <label className="font-bold">{dict.formDescEn}</label>
                   <textarea
                     value={formDescEn}
                     onChange={(e) => setFormDescEn(e.target.value)}
                     placeholder="English description..."
                     rows={2}
-                    className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                    className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none text-left"
                     required
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-bold">روابط الصور (رابط مباشر أو روابط تفصلها فواصل للصور المتعددة):</label>
+                  <label className="font-bold">{dict.formImages}</label>
                   <input
                     type="text"
                     value={formImages}
@@ -572,22 +666,22 @@ export default function AdminDashboard() {
                     className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none text-left"
                     dir="ltr"
                   />
-                  <p className="text-[10px] text-navy-900/40">يمكنك إدخال رابط أو عدة روابط صور مفصولة بفواصل لجعل المعرض متحركاً.</p>
+                  <p className="text-[10px] text-navy-900/40">{dict.formImagesDesc}</p>
                 </div>
 
-                <div className="flex gap-2 justify-end">
+                <div className={`flex gap-2 ${isAr ? "justify-end" : "justify-start"}`}>
                   <button
                     type="button"
                     onClick={() => setShowProductForm(false)}
-                    className="bg-white border rounded px-4 py-2"
+                    className="bg-white border rounded px-4 py-2 cursor-pointer"
                   >
-                    إلغاء والعودة
+                    {dict.formCancel}
                   </button>
                   <button
                     type="submit"
-                    className="bg-burgundy-800 text-gold-300 font-bold px-6 py-2 rounded border border-gold-500/20"
+                    className="bg-burgundy-800 text-gold-300 font-bold px-6 py-2 rounded border border-gold-500/20 cursor-pointer"
                   >
-                    حفظ وتأكيد التخزين
+                    {dict.formSave}
                   </button>
                 </div>
               </form>
@@ -596,46 +690,48 @@ export default function AdminDashboard() {
 
           {/* Table display */}
           <div className="bg-white rounded-2xl border border-gold-500/10 overflow-hidden shadow-sm">
-            <table className="w-full text-right text-xs">
+            <table className={`w-full text-xs ${isAr ? "text-right" : "text-left"}`}>
               <thead className="bg-ivory-200 border-b border-gold-500/10 font-bold text-navy-950">
-                <tr>
-                  <th className="p-3">رمز SKU</th>
-                  <th className="p-3">اسم المنتج بالعربية</th>
-                  <th className="p-3">القسم الكنسي</th>
-                  <th className="p-3 text-center">السعر أساسي/خصم</th>
-                  <th className="p-3 text-center">المخزن</th>
-                  <th className="p-3 text-left">التحكم</th>
+                <tr className={isAr ? "" : "flex-row-reverse"}>
+                  <th className="p-3">{dict.tableSku}</th>
+                  <th className="p-3">{dict.tableName}</th>
+                  <th className="p-3">{dict.tableCategory}</th>
+                  <th className="p-3 text-center">{dict.tablePrice}</th>
+                  <th className="p-3 text-center">{dict.tableStock}</th>
+                  <th className={`p-3 ${isAr ? "text-left" : "text-right"}`}>{dict.tableAction}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gold-500/5 font-semibold text-navy-900/80">
                 {products.map((p) => (
                   <tr key={p.id} className="hover:bg-gold-500/5 transition-colors">
                     <td className="p-3 font-mono font-bold text-gold-600">{p.sku}</td>
-                    <td className="p-3 font-bold text-navy-950">{p.name_ar}</td>
+                    <td className="p-3 font-bold text-navy-950">{isAr ? p.name_ar : p.name_en}</td>
                     <td className="p-3 text-[10px] text-navy-900/60">
-                      {categories.find(c => c.id === p.category_id)?.name_ar}
+                      {isAr 
+                        ? categories.find(c => c.id === p.category_id)?.name_ar 
+                        : categories.find(c => c.id === p.category_id)?.name_en}
                     </td>
                     <td className="p-3 text-center font-bold">
-                      {p.price} ج.م / {p.discount_price ? `${p.discount_price} ج.م` : "بلا"}
+                      {p.price} {isAr ? "ج.م" : "EGP"} / {p.discount_price ? `${p.discount_price} ${isAr ? "ج.م" : "EGP"}` : "-"}
                     </td>
                     <td className="p-3 text-center">
                       <span className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold ${
                         p.stock_quantity <= 4 ? "bg-red-100 text-red-800 font-extrabold" : "bg-green-100 text-green-800"
                       }`}>
-                        {p.stock_quantity} قطعة
+                        {p.stock_quantity} {dict.pcs}
                       </span>
                     </td>
-                    <td className="p-3 text-left flex gap-2 justify-end">
+                    <td className={`p-3 flex gap-2 ${isAr ? "justify-end text-left" : "justify-start text-right"}`}>
                       <button
                         onClick={() => handleOpenEditProduct(p)}
-                        className="text-gold-600 hover:text-burgundy-800 p-1"
+                        className="text-gold-600 hover:text-burgundy-800 p-1 cursor-pointer"
                         title="تعديل المنتج"
                       >
                         <Edit3 className="w-4.5 h-4.5" />
                       </button>
                       <button
                         onClick={() => handleDeleteProduct(p.id)}
-                        className="text-red-500 hover:text-red-700 p-1"
+                        className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
                         title="حذف نهائي"
                       >
                         <Trash2 className="w-4.5 h-4.5" />
@@ -654,51 +750,51 @@ export default function AdminDashboard() {
       {activeTab === "categories" && (
         <div className="space-y-6 animate-fade-in text-xs text-navy-950">
           
-          <div className="flex justify-between items-center">
-            <h3 className="font-serif text-base font-bold text-burgundy-800">إدارة الأقسام والكاتيجوريز الكنسية</h3>
+          <div className={`flex justify-between items-center ${isAr ? "" : "flex-row-reverse"}`}>
+            <h3 className="font-serif text-base font-bold text-burgundy-800">{dict.catHeading}</h3>
             <button
               onClick={handleOpenAddCategory}
               className="bg-gold-500 hover:bg-gold-600 text-burgundy-900 font-extrabold px-4 py-2.5 rounded-lg text-xs border border-gold-400 cursor-pointer flex items-center gap-1"
             >
               <Plus className="w-4 h-4" />
-              <span>إضافة قسم كنسي جديد</span>
+              <span>{dict.catAddBtn}</span>
             </button>
           </div>
 
           {showCategoryForm && (
             <div className="bg-ivory-200 border-2 border-gold-500/25 p-6 rounded-2xl shadow-lg animate-fade-in text-xs text-navy-950">
-              <form onSubmit={handleCategorySubmit} className="space-y-6">
+              <form onSubmit={handleCategorySubmit} className={`space-y-6 ${isAr ? "text-right" : "text-left"}`}>
                 <h4 className="font-serif text-sm font-bold text-burgundy-800 border-b border-gold-500/10 pb-2 mb-4">
-                  {catFormId ? "تعديل بيانات القسم الكنسي" : "إضافة قسم كنسي جديد"}
+                  {catFormId ? dict.catFormEdit : dict.catFormAdd}
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="font-bold">اسم القسم بالعربية:</label>
+                    <label className="font-bold block">{dict.catFormNameAr}</label>
                     <input
                       type="text"
                       value={catFormNameAr}
                       onChange={(e) => setCatFormNameAr(e.target.value)}
                       placeholder="الأيقونات القبطية..."
-                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none text-right"
                       required
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-bold">اسم القسم بالإنجليزية:</label>
+                    <label className="font-bold block">{dict.catFormNameEn}</label>
                     <input
                       type="text"
                       value={catFormNameEn}
                       onChange={(e) => setCatFormNameEn(e.target.value)}
                       placeholder="Coptic Icons..."
-                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none"
+                      className="w-full bg-white border border-gold-500/10 rounded p-2 focus:outline-none text-left"
                       required
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-bold">Slug (الرمز المميز في الرابط):</label>
+                    <label className="font-bold block">{dict.catFormSlug}</label>
                     <input
                       type="text"
                       value={catFormSlug}
@@ -709,7 +805,7 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-bold">رابط صورة القسم:</label>
+                    <label className="font-bold block">{dict.catFormImage}</label>
                     <input
                       type="text"
                       value={catFormImage}
@@ -721,19 +817,19 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="flex gap-2 justify-end">
+                <div className={`flex gap-2 ${isAr ? "justify-end" : "justify-start"}`}>
                   <button
                     type="button"
                     onClick={() => setShowCategoryForm(false)}
                     className="bg-white border rounded px-4 py-2 cursor-pointer"
                   >
-                    إلغاء والعودة
+                    {dict.catCancel}
                   </button>
                   <button
                     type="submit"
                     className="bg-burgundy-800 text-gold-300 font-bold px-6 py-2 rounded border border-gold-500/20 cursor-pointer"
                   >
-                    حفظ وتأكيد القسم
+                    {dict.catSave}
                   </button>
                 </div>
               </form>
@@ -742,14 +838,14 @@ export default function AdminDashboard() {
 
           {/* Table display */}
           <div className="bg-white rounded-2xl border border-gold-500/10 overflow-hidden shadow-sm">
-            <table className="w-full text-right text-xs">
+            <table className={`w-full text-xs ${isAr ? "text-right" : "text-left"}`}>
               <thead className="bg-ivory-200 border-b border-gold-500/10 font-bold text-navy-950">
                 <tr>
-                  <th className="p-3">صورة القسم</th>
-                  <th className="p-3">الاسم بالعربية</th>
-                  <th className="p-3">الاسم بالإنجليزية</th>
-                  <th className="p-3">الرمز Slug</th>
-                  <th className="p-3 text-left">التحكم</th>
+                  <th className="p-3">{dict.catTableImg}</th>
+                  <th className="p-3">{dict.catTableAr}</th>
+                  <th className="p-3">{dict.catTableEn}</th>
+                  <th className="p-3">{dict.catTableSlug}</th>
+                  <th className={`p-3 ${isAr ? "text-left" : "text-right"}`}>{dict.tableAction}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gold-500/5 font-semibold text-navy-900/80">
@@ -757,12 +853,12 @@ export default function AdminDashboard() {
                   <tr key={c.id} className="hover:bg-gold-500/5 transition-colors">
                     <td className="p-3">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={c.image_url} alt={c.name_ar} className="w-10 h-10 object-cover rounded border border-gold-500/10" />
+                      <img src={c.image_url} alt={isAr ? c.name_ar : c.name_en} className="w-10 h-10 object-cover rounded border border-gold-500/10" />
                     </td>
                     <td className="p-3 font-bold text-navy-950">{c.name_ar}</td>
                     <td className="p-3 font-bold text-navy-950">{c.name_en}</td>
                     <td className="p-3 font-mono font-bold text-gold-600">{c.slug}</td>
-                    <td className="p-3 text-left flex gap-2 justify-end pt-5">
+                    <td className={`p-3 flex gap-2 ${isAr ? "justify-end pt-5 text-left" : "justify-start pt-5 text-right"}`}>
                       <button
                         onClick={() => handleOpenEditCategory(c)}
                         className="text-gold-600 hover:text-burgundy-800 p-1 cursor-pointer"
@@ -790,26 +886,26 @@ export default function AdminDashboard() {
       {/* TAB 3: ORDER LIST & STATUS TRANSITION */}
       {activeTab === "orders" && (
         <div className="space-y-6 animate-fade-in text-xs text-navy-950">
-          <h3 className="font-serif text-base font-bold text-burgundy-800 border-b border-gold-500/10 pb-2.5">
-            إدارة طلبات ومبيعات العملاء
+          <h3 className={`font-serif text-base font-bold text-burgundy-800 border-b border-gold-500/10 pb-2.5 ${isAr ? "text-right" : "text-left"}`}>
+            {dict.orderHeading}
           </h3>
 
           <div className="bg-white rounded-2xl border border-gold-500/10 overflow-hidden shadow-sm">
-            <table className="w-full text-right text-xs">
+            <table className={`w-full text-xs ${isAr ? "text-right" : "text-left"}`}>
               <thead className="bg-ivory-200 border-b border-gold-500/10 font-bold text-navy-950">
                 <tr>
-                  <th className="p-3">رقم التتبع</th>
-                  <th className="p-3">اسم المستلم والهاتف</th>
-                  <th className="p-3">تاريخ الطلب</th>
-                  <th className="p-3 text-center">السعر الكلي</th>
-                  <th className="p-3 text-center">حالة الدفع/الطلب</th>
-                  <th className="p-3 text-left">تحديث الحالة</th>
+                  <th className="p-3">{dict.orderTableTrack}</th>
+                  <th className="p-3">{dict.orderTableCustomer}</th>
+                  <th className="p-3">{dict.orderTableDate}</th>
+                  <th className="p-3 text-center">{dict.orderTableTotal}</th>
+                  <th className="p-3 text-center">{dict.orderTableStatus}</th>
+                  <th className={`p-3 ${isAr ? "text-left" : "text-right"}`}>{dict.orderTableAction}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gold-500/5 font-semibold text-navy-900/80">
                 {orders.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="p-8 text-center text-navy-900/40">لا توجد أي مبيعات أو طلبات مسجلة بعد.</td>
+                    <td colSpan={6} className="p-8 text-center text-navy-900/40">{dict.orderEmpty}</td>
                   </tr>
                 ) : (
                   orders.map((o) => (
@@ -820,35 +916,35 @@ export default function AdminDashboard() {
                         <p className="text-[10px] text-navy-900/50 mt-0.5">{o.shipping_address.phone}</p>
                       </td>
                       <td className="p-3 text-[10px] text-navy-900/40">
-                        {new Date(o.created_at).toLocaleString("ar-EG")}
+                        {new Date(o.created_at).toLocaleString(isAr ? "ar-EG" : "en-US")}
                       </td>
-                      <td className="p-3 text-center font-bold text-burgundy-800">{o.total} ج.م</td>
+                      <td className="p-3 text-center font-bold text-burgundy-800">{o.total} {isAr ? "ج.م" : "EGP"}</td>
                       <td className="p-3 text-center space-y-1">
                         <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
                           o.status === "completed" ? "bg-green-100 text-green-700" :
                           o.status === "processing" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"
                         }`}>
-                          {o.status === "pending" ? "قيد المراجعة" :
-                           o.status === "processing" ? "قيد التجهيز" : "تم الشحن"}
+                          {o.status === "pending" ? dict.orderStatusPending :
+                           o.status === "processing" ? dict.orderStatusProcessing : dict.orderStatusCompleted}
                         </span>
                         <span className={`block text-[9px] font-bold text-center ${
                           o.payment_status === "paid" ? "text-green-600" : "text-amber-600"
                         }`}>
-                          ({o.payment_status === "paid" ? "مدفوع" : "غير مدفوع بعد"})
+                          ({o.payment_status === "paid" ? dict.orderPaid : dict.orderUnpaid})
                         </span>
                       </td>
-                      <td className="p-3 text-left flex gap-1 justify-end pt-5">
+                      <td className={`p-3 flex gap-1 pt-5 ${isAr ? "justify-end text-left" : "justify-start text-right"}`}>
                         <button
                           onClick={() => handleUpdateOrderStatus(o.id, "processing")}
                           className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded border border-blue-500/20 text-[10px] cursor-pointer"
                         >
-                          تجهيز
+                          {dict.orderActionProcess}
                         </button>
                         <button
                           onClick={() => handleUpdateOrderStatus(o.id, "completed", "paid")}
                           className="bg-green-50 hover:bg-green-100 text-green-700 px-2 py-1 rounded border border-green-500/20 text-[10px] cursor-pointer"
                         >
-                          شحن/أنجز
+                          {dict.orderActionShip}
                         </button>
                       </td>
                     </tr>
@@ -863,63 +959,63 @@ export default function AdminDashboard() {
       {/* TAB 4: CUSTOM ORDER REQUEST INBOX & QUOTATIONS */}
       {activeTab === "customs" && (
         <div className="space-y-6 animate-fade-in text-xs text-navy-950">
-          <h3 className="font-serif text-base font-bold text-burgundy-800 border-b border-gold-500/10 pb-2.5">
-            صندوق الوارد لطلبات التفصيل والأعمال الخشبية المحفورة بالطلب
+          <h3 className={`font-serif text-base font-bold text-burgundy-800 border-b border-gold-500/10 pb-2.5 ${isAr ? "text-right" : "text-left"}`}>
+            {dict.customHeading}
           </h3>
 
           <div className="space-y-4">
             {customs.length === 0 ? (
               <div className="bg-white rounded-2xl border border-gold-500/10 p-12 text-center text-navy-900/40">
-                لا توجد طلبات تفصيل أو حفر خشب مخصصة حتى الآن.
+                {dict.customEmpty}
               </div>
             ) : (
               customs.map((c) => (
                 <div key={c.id} className="bg-white rounded-xl border border-gold-500/15 p-6 shadow-sm space-y-4">
-                  <div className="flex justify-between items-start border-b border-gold-500/5 pb-2">
-                    <div>
+                  <div className={`flex justify-between items-start border-b border-gold-500/5 pb-2 ${isAr ? "" : "flex-row-reverse"}`}>
+                    <div className={isAr ? "text-right" : "text-left"}>
                       <h4 className="font-bold text-sm text-burgundy-800">{c.type}</h4>
                       <p className="text-[10px] text-navy-900/40 mt-0.5">
-                        العميل: {c.name} | هاتف للتواصل: <a href={`tel:${c.phone}`} className="font-bold hover:underline">{c.phone}</a> | {new Date(c.created_at).toLocaleString("ar-EG")}
+                        {isAr ? "العميل:" : "Client:"} {c.name} | {isAr ? "هاتف للتواصل:" : "Contact phone:"} <a href={`tel:${c.phone}`} className="font-bold hover:underline">{c.phone}</a> | {new Date(c.created_at).toLocaleString(isAr ? "ar-EG" : "en-US")}
                       </p>
                     </div>
                     <div>
                       <span className={`inline-block px-3 py-1 rounded text-[10px] font-bold ${
                         c.status === "quoted" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
                       }`}>
-                        الحالة: {c.status === "pending" ? "بانتظار عرض السعر" : `تم التسعير بـ ${c.quote_amount} ج.م`}
+                        {c.status === "pending" ? dict.customStatusPending : dict.customStatusQuoted(c.quote_amount!)}
                       </span>
                     </div>
                   </div>
 
-                  <div className="whitespace-pre-wrap leading-relaxed bg-ivory-200/50 p-4 rounded border border-gold-500/5">
+                  <div className={`whitespace-pre-wrap leading-relaxed bg-ivory-200/50 p-4 rounded border border-gold-500/5 ${isAr ? "text-right" : "text-left"}`} dir={isAr ? "rtl" : "ltr"}>
                     {c.details}
                   </div>
 
                   {/* Submission quote field */}
                   {c.status === "pending" && (
-                    <div>
+                    <div className={isAr ? "text-right" : "text-left"}>
                       {selectedCustomId === c.id ? (
-                        <form onSubmit={(e) => handleCustomQuoteSubmit(e, c.id)} className="flex gap-2 items-center max-w-sm">
+                        <form onSubmit={(e) => handleCustomQuoteSubmit(e, c.id)} className={`flex gap-2 items-center max-w-sm ${isAr ? "" : "flex-row-reverse"}`}>
                           <input
                             type="number"
                             value={quoteVal}
                             onChange={(e) => setQuoteVal(e.target.value)}
-                            placeholder="المبلغ الإجمالي بالجنيه..."
-                            className="bg-ivory-200 border border-gold-500/20 rounded p-2.5 text-xs text-center w-full focus:outline-none"
+                            placeholder={dict.customQuotePlaceholder}
+                            className={`bg-ivory-200 border border-gold-500/20 rounded p-2.5 text-xs text-center w-full focus:outline-none`}
                             required
                           />
                           <button
                             type="submit"
                             className="bg-burgundy-800 text-gold-300 font-bold px-4 py-2.5 rounded border border-gold-500/20 text-xs shrink-0 cursor-pointer"
                           >
-                            تأكيد السعر
+                            {dict.customQuoteConfirm}
                           </button>
                           <button
                             type="button"
                             onClick={() => setSelectedCustomId(null)}
-                            className="bg-white border rounded px-3 py-2.5 text-xs text-navy-900/60"
+                            className="bg-white border rounded px-3 py-2.5 text-xs text-navy-900/60 cursor-pointer"
                           >
-                            إلغاء
+                            {dict.customQuoteCancel}
                           </button>
                         </form>
                       ) : (
@@ -927,7 +1023,7 @@ export default function AdminDashboard() {
                           onClick={() => setSelectedCustomId(c.id)}
                           className="bg-gold-500 hover:bg-gold-600 text-burgundy-900 font-bold px-4 py-2 rounded text-xs border border-gold-400 cursor-pointer"
                         >
-                          تحديد وعرض السعر المالي للعميل
+                          {dict.customQuoteBtn}
                         </button>
                       )}
                     </div>

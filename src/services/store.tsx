@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { Product, Category } from "./db-mock-data";
-import { UserSession } from "./api";
+import { Product, Category, PRODUCTS as staticProducts, CATEGORIES as staticCategories } from "./db-mock-data";
+import { getProducts, getCategories, UserSession } from "./api";
 
 export interface CartItem {
   product: Product;
@@ -36,6 +36,10 @@ interface AppContextType {
 
   language: "ar" | "en";
   setLanguage: (lang: "ar" | "en") => void;
+  
+  products: Product[];
+  categories: Category[];
+  refreshData: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -48,9 +52,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [notifications, setNotifications] = useState<{ id: string; message: string; date: string; read: boolean }[]>([]);
   const [language, setLanguageState] = useState<"ar" | "en">("ar");
+  const [products, setProducts] = useState<Product[]>(staticProducts);
+  const [categories, setCategories] = useState<Category[]>(staticCategories);
+
+  const refreshData = async () => {
+    try {
+      const p = await getProducts();
+      const cats = await getCategories();
+      if (p && p.length > 0) setProducts(p);
+      if (cats && cats.length > 0) setCategories(cats);
+    } catch (err) {
+      console.error("Failed to fetch dynamic store data from API", err);
+    }
+  };
 
   // Load state on mount
   useEffect(() => {
+    refreshData();
     if (typeof window !== "undefined") {
       const storedLang = localStorage.getItem("taxsis_lang") as "ar" | "en" | null;
       if (storedLang) {
@@ -253,7 +271,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         addNotification,
         markNotificationsAsRead,
         language,
-        setLanguage
+        setLanguage,
+        products,
+        categories,
+        refreshData
       }}
     >
       {children}

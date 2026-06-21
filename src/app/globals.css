@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cinzel:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -6,6 +6,11 @@
   --foreground: #0F172A; /* Navy/Charcoal text */
   --font-cairo: 'Cairo', sans-serif;
   --font-amiri: 'Amiri', serif;
+}
+
+html[lang="en"] {
+  --font-cairo: 'Inter', sans-serif;
+  --font-amiri: 'Cinzel', serif;
 }
 
 @theme {
