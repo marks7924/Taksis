@@ -65,536 +65,756 @@ export interface FAQ {
 }
 
 export const CATEGORIES: Category[] = [
-  { id: "cat-1", name_ar: "الدفوف الكنسية", name_en: "Liturgical Cymbals (Daf)", slug: "church-daf", image_url: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-2", name_ar: "التريانتو", name_en: "Trianto", slug: "trianto", image_url: "https://images.unsplash.com/photo-1484755560693-a4074577af3a?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-3", name_ar: "الصنوج", name_en: "Sanooj (Cymbals)", slug: "sanooj", image_url: "https://images.unsplash.com/photo-1507838153414-b4b713384a76?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-4", name_ar: "الطونية", name_en: "Tonia (Deacon Vestments)", slug: "tonia", image_url: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-5", name_ar: "البطراشيل", name_en: "Batrashil (Stoles)", slug: "batrashil", image_url: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-6", name_ar: "الملابس الكهنوتية", name_en: "Clergy Vestments", slug: "clergy-vestments", image_url: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-7", name_ar: "الشورية", name_en: "Shoria (Censer)", slug: "shoria", image_url: "https://images.unsplash.com/photo-1590076212558-86d7950efc47?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-8", name_ar: "الأواني الكنسية", name_en: "Liturgical Vessels", slug: "liturgical-vessels", image_url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-9", name_ar: "الكتب الكنسية", name_en: "Church Liturgy Books", slug: "liturgical-books", image_url: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-10", name_ar: "الأيقونات", name_en: "Coptic Icons", slug: "coptic-icons", image_url: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-11", name_ar: "الصلبان", name_en: "Crosses", slug: "crosses", image_url: "https://images.unsplash.com/photo-1594897030264-ab7d87efc473?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-12", name_ar: "مستلزمات المذبح", name_en: "Altar Supplies", slug: "altar-supplies", image_url: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-13", name_ar: "الأعمال الخشبية المحفورة", name_en: "Engraved Woodworks", slug: "engraved-woodworks", image_url: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-14", name_ar: "الهدايا والتذكارات الروحية", name_en: "Spiritual Gifts & Souvenirs", slug: "spiritual-gifts", image_url: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-15", name_ar: "أدوات الشمامسة", name_en: "Deacon Accessories", slug: "deacon-accessories", image_url: "https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-16", name_ar: "مستلزمات الكنائس", name_en: "Church Furnishings", slug: "church-furnishings", image_url: "https://images.unsplash.com/photo-1478147427282-58a87a120781?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-17", name_ar: "مستلزمات الأديرة", name_en: "Monastery Supplies", slug: "monastery-supplies", image_url: "https://images.unsplash.com/photo-1548625361-155de6c7f54d?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-18", name_ar: "منتجات مخصصة", name_en: "Custom Made Products", slug: "custom-made", image_url: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=400&q=80" },
-  { id: "cat-19", name_ar: "منتجات أخرى", name_en: "Other Products", slug: "other-products", image_url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80" }
+  { id: "cat-1", name_ar: "آلات الكنيسة", name_en: "Church Instruments", slug: "church-instruments", image_url: "/images/دف نحاس.jpg" },
+  { id: "cat-2", name_ar: "التونية", name_en: "Deacon Tonia", slug: "deacon-tonia", image_url: "/images/تونيه.jpg" },
+  { id: "cat-3", name_ar: "البطراشيل", name_en: "Batrashil (Stoles)", slug: "batrashil", image_url: "/images/بطراشيل.jpg" },
+  { id: "cat-4", name_ar: "ملابس الكهنوت", name_en: "Clergy Vestments", slug: "clergy-vestments", image_url: "" },
+  { id: "cat-5", name_ar: "الشورية", name_en: "Shoria (Censer)", slug: "shoria", image_url: "/images/شوريه.jpg" },
+  { id: "cat-6", name_ar: "أواني المذبح", name_en: "Liturgical Vessels", slug: "liturgical-vessels", image_url: "/images/اواني مذبح.jpg" },
+  { id: "cat-7", name_ar: "كتب الكنيسة", name_en: "Church Liturgy Books", slug: "liturgical-books", image_url: "" },
+  { id: "cat-8", name_ar: "الصلبان", name_en: "Crosses", slug: "crosses", image_url: "" },
+  { id: "cat-9", name_ar: "مستلزمات المذبح", name_en: "Altar Supplies", slug: "altar-supplies", image_url: "/images/فرش مذبج.jpg" },
+  { id: "cat-10", name_ar: "الأعمال الخشبية والحفر", name_en: "Engraved Woodworks & Carving", slug: "engraved-woodworks", image_url: "/images/حفر كوستر خشب.jpg" },
+  { id: "cat-11", name_ar: "منتجات أخرى", name_en: "Others", slug: "others", image_url: "" }
 ];
 
 export const PRODUCTS: Product[] = [
+  // 1- الات الكنيسه
   {
-    id: "prod-1",
-    sku: "TS-DAF-GLD-01",
-    name_ar: "دف كنسي نحاسي مذهب فاخر",
-    name_en: "Premium Golden Brass Liturgical Cymbals (Daf)",
-    description_ar: "دف كنسي مصنوع يدوياً من النحاس الخالص عالي الجودة مع طلاء ذهبي مقاوم للصدأ. يتميز بنقوش قبطية كنسية دقيقة وصوت رنان وقوي متناغم مع ألحان الكنيسة القبطية الأرثوذكسية.",
-    description_en: "Handcrafted liturgical cymbals (Daf) made of premium solid brass with a rust-resistant gold plating. Features intricate Coptic engravings and a resonant, clear acoustic tone tailored for Coptic Orthodox liturgical hymns.",
-    price: 1850,
-    discount_price: 1600,
+    id: "prod-daf-brass",
+    sku: "TS-DAF-BRS",
+    name_ar: "الدف النحاس",
+    name_en: "Brass Daf (Liturgical Cymbals)",
+    description_ar: "دف كنسي مصنوع من النحاس الخالص عالي الجودة متوفر بمقاسات وأوزان مختلفة.",
+    description_en: "Liturgical Daf made of pure brass, available in various sizes and weights.",
+    price: 100,
     category_id: "cat-1",
-    stock_quantity: 15,
-    images: [
-      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80"
-    ],
+    stock_quantity: 50,
+    images: ["/images/دف نحاس.jpg"],
     specifications: {
-      "الخامة": "نحاس خالص مذهب",
-      "القطر": "٢٢ سم",
-      "الوزن": "٨٠٠ جرام",
-      "المنشأ": "صناعة يدوية مصرية بورش طاكسيس"
+      "الخامة": "نحاس خالص",
+      "المنشأ": "صناعة مصرية"
     },
     variants: [
-      { type: "size", options: ["صغير (١٨ سم)", "متوسط (٢٢ سم)", "كبير (٢٦ سم)"] }
+      {
+        type: "المقاس والوزن",
+        options: [
+          "مقاس ١٦ سنتيمتر (100 جنيه)",
+          "مقاس ١٨ سنتيمتر تقيل ٤٠٠ جرام (200 جنيه)",
+          "مقاس ١٨ سنتيمتر تقيل جدا ٥٠٠ جرام (300 جنيه)",
+          "مقاس ٢٠ سنتيمتر تقيل ٤٠٠ جرام (400 جنيه)",
+          "مقاس ٢٠ سنتيمتر تقيل ٥٠٠ جرام (500 جنيه)",
+          "مقاس ٢٠ سنتيمتر ٦٥٠ جرام (600 جنيه)"
+        ]
+      }
     ],
-    rating: 4.8,
-    review_count: 12,
+    rating: 5.0,
+    review_count: 0,
+    is_featured: true,
+    is_best_seller: true,
+    is_new_arrival: true,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-daf-nickel",
+    sku: "TS-DAF-NKL",
+    name_ar: "الدف النيكل",
+    name_en: "Nickel Daf",
+    description_ar: "دف كنسي مصنوع من النيكل عالي الجودة.",
+    description_en: "Liturgical Daf made of high-quality nickel.",
+    price: 150,
+    category_id: "cat-1",
+    stock_quantity: 30,
+    images: [],
+    specifications: {
+      "الخامة": "نيكل"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-trianto-reg",
+    sku: "TS-TRI-REG",
+    name_ar: "التريانتو العادي",
+    name_en: "Regular Trianto",
+    description_ar: "تريانتو كنسي عادي متوفر بثلاثة مقاسات مختلفة.",
+    description_en: "Regular liturgical trianto available in three different sizes.",
+    price: 60,
+    category_id: "cat-1",
+    stock_quantity: 40,
+    images: [],
+    specifications: {
+      "النوع": "عادي"
+    },
+    variants: [
+      {
+        type: "المقاس",
+        options: [
+          "صغير طول الضلع ١٥ سم (٦٠ جنيه)",
+          "وسط طول الضلع ٢٠ سم (٨٠ جنيه)",
+          "كبير طول الضلع ٢٥ سم (١٠٠ جنيه)"
+        ]
+      }
+    ],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-trianto-mon",
+    sku: "TS-TRI-MON",
+    name_ar: "تريانتو الأديرة (التخين) المخصوص",
+    name_en: "Monastery Trianto (Thick Special)",
+    description_ar: "تريانتو ثقيل مخصوص للأديرة والتسبحة الطويلة متوفر بمقاسين.",
+    description_en: "Thick special monastery trianto for long praises, available in two sizes.",
+    price: 150,
+    category_id: "cat-1",
+    stock_quantity: 25,
+    images: [],
+    specifications: {
+      "النوع": "تخين مخصوص للأديرة"
+    },
+    variants: [
+      {
+        type: "المقاس",
+        options: [
+          "وسط طول الضلع ٢٠ سم (١٥٠ جنيه)",
+          "كبير طول الضلع ٢٥ سم (٢٠٠ جنيه)"
+        ]
+      }
+    ],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-daf-case",
+    sku: "TS-DAF-CASE",
+    name_ar: "جراب دف قطيفة",
+    name_en: "Velvet Daf Case",
+    description_ar: "جراب لحماية الدف مصنوع من القطيفة الفاخرة.",
+    description_en: "Protective case for Daf made of premium velvet.",
+    price: 50,
+    category_id: "cat-1",
+    stock_quantity: 100,
+    images: [],
+    specifications: {
+      "الخامة": "قطيفة فاخرة"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-laser-eng",
+    sku: "TS-LASER-ENG",
+    name_ar: "حفر ليزر بالكلمة",
+    name_en: "Laser Engraving (Per Word)",
+    description_ar: "خدمة حفر ليزر بالكلمة بحد أدنى ٥٠ جنيه للفردة.",
+    description_en: "Laser engraving service per word, minimum 50 EGP per piece.",
+    price: 25,
+    category_id: "cat-1",
+    stock_quantity: 999,
+    images: [],
+    specifications: {},
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-sanooj",
+    sku: "TS-SAN-NEW",
+    name_ar: "الصنوج",
+    name_en: "Sanooj (Liturgical Cymbals)",
+    description_ar: "صنوج نحاسية كنسية نغمية متناسقة للألحان والتسبحة.",
+    description_en: "Tuned liturgical cymbals for church hymns and praises.",
+    price: 2000,
+    category_id: "cat-1",
+    stock_quantity: 10,
+    images: [],
+    specifications: {
+      "الخامة": "نحاس"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+
+  // 2- التونيه
+  {
+    id: "prod-tonia-isis",
+    sku: "TS-TON-ISIS",
+    name_ar: "تونية خامة إيزيس",
+    name_en: "Tonia (Isis Fabric)",
+    description_ar: "تونية شماس مصنوعة من خامة إيزيس المريحة. يقاس الطول من الكتف للأرض. زيادة ٣٠ جنيه في حالة تظبيط مقاسات مخصوص.",
+    description_en: "Deacon Tonia made of comfortable Isis fabric. Length is measured from shoulder to ground. +30 EGP for special custom sizing.",
+    price: 225,
+    category_id: "cat-2",
+    stock_quantity: 100,
+    images: ["/images/تونيه.jpg"],
+    specifications: {
+      "الخامة": "إيزيس"
+    },
+    variants: [
+      {
+        type: "الطول",
+        options: [
+          "طول ٨٠ سم (٢٢٥ جنيه)",
+          "طول ٩٠ سم (٢٤٠ جنيه)",
+          "طول ١٠٠ سم (٢٦٠ جنيه)",
+          "طول ١١٠ سم (٢٧٥ جنيه)",
+          "طول ١٢٠ سم (٢٩٠ جنيه)",
+          "طول ١٣٠ سم (٣١٠ جنيه)",
+          "طول ١٤٠ سم (٣٢٥ جنيه)",
+          "طول ١٥٠ سم (٣٥٠ جنيه)",
+          "طول ١٦٠ سم (٣٧٥ جنيه)"
+        ]
+      }
+    ],
+    rating: 5.0,
+    review_count: 0,
     is_featured: true,
     is_best_seller: true,
     is_new_arrival: false,
     is_limited_edition: false
   },
   {
-    id: "prod-2",
-    sku: "TS-TRI-ORN-01",
-    name_ar: "تريانتو كنسي مزخرف بالصلبان",
-    name_en: "Ornate Liturgical Trianto with Crosses",
-    description_ar: "تريانتو (مثلث كنسي) مصمم خصيصاً للتسبحة والألحان الكنسية، مصنوع من الحديد المصقول والمطلي بطبقة واقية، ويأتي مع ذراع نحاسي متين وصليب معلق.",
-    description_en: "Liturgical Trianto (triangle instrument) designed specifically for Coptic praises and hymns. Made of polished steel with a protective coating, comes with a sturdy brass striker and a dangling cross accent.",
-    price: 450,
+    id: "prod-tonia-silk-normal",
+    sku: "TS-TON-SLK-NORM",
+    name_ar: "تونية حرير صليب عادي",
+    name_en: "Silk Tonia with Normal Cross",
+    description_ar: "تونية شماس حرير فاخرة مطرزة بصليب عادي. زيادة ٣٠ جنيه في حالة تظبيط مقاسات مخصوص.",
+    description_en: "Luxury silk deacon Tonia embroidered with a normal cross. +30 EGP for special custom sizing.",
+    price: 900,
     category_id: "cat-2",
-    stock_quantity: 30,
-    images: [
-      "https://images.unsplash.com/photo-1484755560693-a4074577af3a?auto=format&fit=crop&w=600&q=80"
-    ],
+    stock_quantity: 20,
+    images: ["/images/تونيه.jpg"],
     specifications: {
-      "الخامة": "حديد مصقول ومطلي بمقاوم الصدأ",
-      "الطول": "٢٠ سم",
-      "الملحقات": "ذراع ضرب نحاسي وحبل تعليق"
+      "الخامة": "حرير"
     },
     variants: [],
-    rating: 4.5,
-    review_count: 7,
+    rating: 5.0,
+    review_count: 0,
     is_featured: false,
     is_best_seller: false,
-    is_new_arrival: true,
+    is_new_arrival: false,
     is_limited_edition: false
   },
   {
-    id: "prod-3",
-    sku: "TS-SAN-BRS-01",
-    name_ar: "صنوج نحاسية يدوية متناغمة",
-    name_en: "Handcrafted Brass Sanooj (Cymbals)",
-    description_ar: "زوج من الصنوج النحاسية المصنوعة يدوياً لضمان نقاء الصوت وثبات النغمة. مناسبة جداً للاستخدام في كافة الصلوات والألحان الكنسية اليومية.",
-    description_en: "A pair of handcrafted brass cymbals (Sanooj) tuned to perfection for Coptic liturgy. Essential for rhythm keeping in prayers and daily divine services.",
-    price: 950,
-    discount_price: 850,
+    id: "prod-tonia-silk-velvet",
+    sku: "TS-TON-SLK-VELV",
+    name_ar: "تونية حرير قطيفة أو أيقونة",
+    name_en: "Silk Tonia with Velvet / Icon",
+    description_ar: "تونية شماس حرير فاخرة مع قطيفة أو تطريز أيقونة كاملة. زيادة ٣٠ جنيه في حالة تظبيط مقاسات مخصوص.",
+    description_en: "Luxury silk deacon Tonia with velvet details or fully embroidered icon. +30 EGP for special custom sizing.",
+    price: 1000,
+    category_id: "cat-2",
+    stock_quantity: 15,
+    images: ["/images/تونيه.jpg"],
+    specifications: {
+      "الخامة": "حرير مع قطيفة / أيقونة"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+
+  // 3- البطراشيل
+  {
+    id: "prod-batrashil-fully-emb",
+    sku: "TS-BAT-FULL-EMB",
+    name_ar: "بطرشيل قطيفة مطرز كامل",
+    name_en: "Fully Embroidered Velvet Batrashil",
+    description_ar: "بطرشيل قطيفة فاخر مطرز بالكامل برسوم ونقوش قبطية دقيقة.",
+    description_en: "Premium velvet Batrashil, fully embroidered with detailed Coptic iconography.",
+    price: 750,
+    category_id: "cat-3",
+    stock_quantity: 15,
+    images: ["/images/بطراشيل.jpg"],
+    specifications: {
+      "الخامة": "قطيفة مطرزة"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: true,
+    is_best_seller: true,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-batrashil-clerical",
+    sku: "TS-BAT-CLERICAL",
+    name_ar: "بطرشيل إكليريكية قطيفة",
+    name_en: "Velvet Clerical Batrashil",
+    description_ar: "بطرشيل قطيفة مخصص لطلبة الكلية الإكليريكية والشمامسة.",
+    description_en: "Velvet Batrashil designed for clerical students and deacons.",
+    price: 650,
+    category_id: "cat-3",
+    stock_quantity: 20,
+    images: ["/images/بطراشيل.jpg"],
+    specifications: {
+      "الخامة": "قطيفة إكليريكية"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-batrashil-3cross",
+    sku: "TS-BAT-3CROSS",
+    name_ar: "بطرشيل قطيفة ٣ صليب",
+    name_en: "Velvet Batrashil with 3 Crosses",
+    description_ar: "بطرشيل قطيفة مزين بثلاثة صلبان مطرزة.",
+    description_en: "Velvet Batrashil decorated with 3 embroidered crosses.",
+    price: 500,
     category_id: "cat-3",
     stock_quantity: 25,
-    images: [
-      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?auto=format&fit=crop&w=600&q=80"
-    ],
+    images: ["/images/بطراشيل.jpg"],
     specifications: {
-      "الخامة": "نحاس مسبوك يدوياً",
-      "القطر": "١٥ سم",
-      "العدد": "زوج (قطعتين)"
+      "الخامة": "قطيفة"
     },
     variants: [],
-    rating: 4.9,
-    review_count: 18,
-    is_featured: true,
-    is_best_seller: true,
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
     is_new_arrival: false,
     is_limited_edition: false
   },
   {
-    id: "prod-4",
-    sku: "TS-TON-EMB-01",
-    name_ar: "طونية شماس مطرزة بالخيوط الذهبية",
-    name_en: "Embroidered Gold-Thread Deacon Tonia",
-    description_ar: "طونية شماس فاخرة مصنوعة من قماش الكريب الياباني الفاخر المقاوم للتجعد، مطرزة بالكامل بخيوط ذهبية وتصاميم صلبان قبطية أصيلة. مريحة وتناسب جميع الفئات العمرية.",
-    description_en: "Luxury deacon Tonia made of high-quality Japanese crepe fabric. Fully embroidered with gold thread showing Coptic cross motifs. Highly comfortable and designed to last.",
-    price: 1200,
-    category_id: "cat-4",
-    stock_quantity: 20,
-    images: [
-      "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80"
-    ],
+    id: "prod-batrashil-fabric-cross",
+    sku: "TS-BAT-FAB-CROSS",
+    name_ar: "بطرشيل قماش صلبان",
+    name_en: "Cross Fabric Batrashil",
+    description_ar: "بطرشيل مصنوع من قماش الصلبان الفاخر متوفر بأطوال مختلفة.",
+    description_en: "Batrashil made of high quality cross patterned fabric, available in multiple lengths.",
+    price: 175,
+    category_id: "cat-3",
+    stock_quantity: 35,
+    images: ["/images/بطراشيل.jpg"],
     specifications: {
-      "نوع القماش": "كريب ياباني فاخر",
-      "التطريز": "خيوط ذهبية وسيرما سورية ممتازة",
-      "اللون": "أبيض ناصع مع تطريز ذهبي وريد"
+      "الخامة": "قماش صلبان"
     },
     variants: [
-      { type: "size", options: ["١٢٠ سم", "١٣٠ سم", "١٤٠ سم", "١٥٠ سم", "١٦٠ سم"] }
+      {
+        type: "الطول",
+        options: [
+          "طول ٣ متر (١٧٥ جنيه)",
+          "طول ٣.٥ متر (٢٠٠ جنيه)",
+          "طول ٤ متر (٢٢٥ جنيه)",
+          "طول ٤.٥ و ٥ متر (٢٥٠ جنيه)"
+        ]
+      }
     ],
-    rating: 4.7,
-    review_count: 9,
+    rating: 5.0,
+    review_count: 0,
     is_featured: false,
-    is_best_seller: true,
-    is_new_arrival: true,
+    is_best_seller: false,
+    is_new_arrival: false,
     is_limited_edition: false
   },
+
+  // 4- ملابس الكهنوت
+  // No products for now as requested
+
+  // 5- الشورية
   {
-    id: "prod-5",
-    sku: "TS-BAT-VEL-01",
-    name_ar: "بطرشيل كهنوتي قطيفة ملكي أحمر",
-    name_en: "Royal Red Velvet Priest Batrashil (Stole)",
-    description_ar: "بطرشيل كهنوتي مصنوع من القطيفة الإيطالية الفاخرة باللون الأحمر الملكي، مطرز بالكامل بصور القديسين والصلبان بخيوط ذهبية بارزة ونقية. شغل يدوي عالي الدقة.",
-    description_en: "Priest Batrashil (stole) made of rich royal red Italian velvet. Fully embroidered with holy Coptic cross designs and iconic saint portraits in detailed gold threads. Premium craftsmanship.",
-    price: 3200,
-    discount_price: 2800,
+    id: "prod-shoria-greek-large",
+    sku: "TS-SHO-GRK-LRG",
+    name_ar: "شورية يونانى كبيرة",
+    name_en: "Large Greek Shoria",
+    description_ar: "شورية يونانى كبيرة الحجم بتصميم كنسي مميز متوفرة باللونين الذهبي والفضي.",
+    description_en: "Large Greek Shoria with distinctive design, available in gold and silver.",
+    price: 1800,
     category_id: "cat-5",
-    stock_quantity: 5,
-    images: [
-      "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=600&q=80"
-    ],
-    specifications: {
-      "الخامة": "قطيفة إيطالي مستوردة مع بطانة ستان فاخرة",
-      "الخيوط": "سيرما ذهبية فرنسية",
-      "الطول": "١٤٥ سم"
-    },
-    variants: [
-      { type: "color", options: ["أحمر ملكي", "أبيض ملائكي", "أزرق كحلي"] }
-    ],
-    rating: 5.0,
-    review_count: 4,
-    is_featured: true,
-    is_best_seller: false,
-    is_new_arrival: false,
-    is_limited_edition: true
-  },
-  {
-    id: "prod-6",
-    sku: "TS-VES-WHT-01",
-    name_ar: "ملابس كهنوتية بيضاء مذهبة متكاملة",
-    name_en: "Gold-Embroidered Complete White Clergy Vestment",
-    description_ar: "بدلة كهنوتية كاملة تشمل التاج والطونية والبرنص والبطرشيل والأكمام والمنطقة، مصنوعة من قماش البروكار الحريري الفاخر ذو النقوش البارزة ومطرزة بالكامل بخيوط السيرما الذهبية.",
-    description_en: "Full clergy vestment set including the crown, tonia, phelonion (burnus), stole (batrashil), cuffs, and belt. Crafted from premium patterned silk brocade fabric and embroidered with fine gold thread.",
-    price: 12500,
-    discount_price: 11000,
-    category_id: "cat-6",
-    stock_quantity: 3,
-    images: [
-      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80"
-    ],
-    specifications: {
-      "المكونات": "طاقية/تاج + برنص + بطرشيل + أكمام + منطقة + طونية بيضاء",
-      "القماش": "حرير بروكار سوري فاخر",
-      "الوزن الكلي": "٣.٥ كجم"
-    },
-    variants: [
-      { type: "size", options: ["S (كاهن قصير)", "M (كاهن متوسط)", "L (كاهن طويل)"] }
-    ],
-    rating: 5.0,
-    review_count: 3,
-    is_featured: true,
-    is_best_seller: false,
-    is_new_arrival: true,
-    is_limited_edition: true
-  },
-  {
-    id: "prod-7",
-    sku: "TS-SHO-BRS-01",
-    name_ar: "شورية نحاسية منقوشة يدوياً بالصلبان",
-    name_en: "Hand-Engraved Brass Censer (Shoria)",
-    description_ar: "شورية (مجمرة) كنسية مصنوعة من النحاس الأصفر الثقيل المنقوش يدوياً بالصلبان والزخارف النباتية القبطية. مجهزة بسلاسل قوية متينة وأجراس ذات صوت عذب ونقي ترن أثناء التبخير.",
-    description_en: "Liturgical censer (Shoria) made of heavy yellow brass, hand-engraved with crosses and Coptic floral borders. Equipped with strong, high-durability chains and sweet-ringing bells that chime gently during censing.",
-    price: 2400,
-    category_id: "cat-7",
     stock_quantity: 8,
-    images: [
-      "https://images.unsplash.com/photo-1590076212558-86d7950efc47?auto=format&fit=crop&w=600&q=80"
-    ],
+    images: ["/images/شوريه.jpg"],
     specifications: {
-      "الخامة": "نحاس أصفر مصمت",
-      "الارتفاع": "٣٢ سم",
-      "عدد السلاسل": "٣ سلاسل رئيسية + سلسلة متوسطة للغطاء + ١٢ جرس تعبيراً عن الرسل الاثني عشر"
-    },
-    variants: [],
-    rating: 4.9,
-    review_count: 15,
-    is_featured: true,
-    is_best_seller: true,
-    is_new_arrival: false,
-    is_limited_edition: false
-  },
-  {
-    id: "prod-8",
-    sku: "TS-VES-GLD-01",
-    name_ar: "طقم أواني كنسية مذهبة للمذبح",
-    name_en: "Gold-Plated Altar Vessels Set",
-    description_ar: "طقم متكامل لخدمة القداس الإلهي مطلي بالذهب عيار ٢٤ المقاوم للتفاعل مع عصير الكرم، يشتمل على الكأس والصينية والنجم والملعقة (المستير) والقبة. مصنوع طبقاً للمقاييس الكنسية الأرثوذكسية الدقيقة.",
-    description_en: "A comprehensive communion vessels set plated in 24k chemical-resistant gold. Includes the Chalice, Paten (Diskos), Asterisk (Star), and Communion Spoon (Mystir). Manufactured strictly following liturgical guidelines.",
-    price: 8900,
-    category_id: "cat-8",
-    stock_quantity: 4,
-    images: [
-      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80"
-    ],
-    specifications: {
-      "الخامة": "فضة أو نحاس مطلي بذهب عيار ٢٤",
-      "المكونات": "كأس، صينية، نجم، ملعقة، قبة حماية",
-      "مقاومة التفاعل": "عالية ومطابقة للمواصفات الغذائية والطقسية"
-    },
-    variants: [],
-    rating: 4.8,
-    review_count: 5,
-    is_featured: false,
-    is_best_seller: false,
-    is_new_arrival: false,
-    is_limited_edition: true
-  },
-  {
-    id: "prod-9",
-    sku: "TS-BOK-KHG-01",
-    name_ar: "كتاب الخولاجي المقدس جلد طبيعي منقوش",
-    name_en: "Engraved Genuine Leather Coptic Khollagy Book",
-    description_ar: "كتاب الخولاجي المقدس (كتاب الصلوات والقداسات الثلاثة الباسيلى والغريغورى والكيرلسى) مغلف بجلد طبيعي فاخر ذو لون بني محروق ومنقوش عليه صليب بارز بالذهب.",
-    description_en: "The Holy Khollagy Book (containing the three liturgies: St. Basil, St. Gregory, and St. Cyril) bound in premium genuine dark brown leather with a gold-leaf embossed Coptic cross.",
-    price: 380,
-    category_id: "cat-9",
-    stock_quantity: 50,
-    images: [
-      "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80"
-    ],
-    specifications: {
-      "الغلاف": "جلد طبيعي بقري ١٠٠٪ يدوي التجليد",
-      "الورق": "أبيض فاخر كريمي مريح للعين أثناء القراءة",
-      "اللغة": "عربي وقبطي متوازي"
+      "النوع": "يوناني كبيرة"
     },
     variants: [
-      { type: "size", options: ["جيب (صغير)", "متوسط", "كبير (مذبح)"] }
+      {
+        type: "اللون",
+        options: [
+          "فضي (١٨٠٠ جنيه)",
+          "ذهبي (٢٠٠٠ جنيه)"
+        ]
+      }
     ],
-    rating: 4.9,
-    review_count: 22,
-    is_featured: true,
-    is_best_seller: true,
-    is_new_arrival: false,
-    is_limited_edition: false
-  },
-  {
-    id: "prod-10",
-    sku: "TS-ICO-MAR-01",
-    name_ar: "أيقونة قبطية أثرية للعذراء مريم رسم يدوي",
-    name_en: "Hand-painted Antique Coptic Icon of St. Mary",
-    description_ar: "أيقونة قبطية كلاسيكية للسيدة العذراء تحمل السيد المسيح، مرسومة يدوياً بألوان البيجمنت الطبيعية وصفار البيض (التمبرا) على خشب معالج ومغطاة بورق ذهب عيار ٢٢. تحفة فنية روحية.",
-    description_en: "A classical Coptic icon of Saint Mary holding Child Jesus. Hand-painted using natural pigment and egg tempera on treated wood, detailed with 22k gold leaf. A spiritual masterpiece.",
-    price: 3500,
-    discount_price: 3200,
-    category_id: "cat-10",
-    stock_quantity: 2,
-    images: [
-      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80"
-    ],
-    specifications: {
-      "الرسام": "أحد فناني الأديرة القبطية المعتمدين",
-      "الخامة": "خشب زان معالج + ألوان تمبرا + ورق ذهب عيار ٢٢",
-      "الأبعاد": "٣٠ × ٤٠ سم"
-    },
-    variants: [],
     rating: 5.0,
-    review_count: 8,
+    review_count: 0,
     is_featured: true,
     is_best_seller: false,
-    is_new_arrival: true,
-    is_limited_edition: true
-  },
-  {
-    id: "prod-11",
-    sku: "TS-CRS-WOD-01",
-    name_ar: "صليب يدوي خشبي محفور بدقة",
-    name_en: "Finely Carved Wooden Hand Cross",
-    description_ar: "صليب يد للآباء الكهنة محفور يدوياً من خشب الزيتون الطبيعي، يشتمل على نقوش معقدة للصلبان القبطية المتشابكة مع ملمس ناعم وحجم مريح للقبضة.",
-    description_en: "A priest's hand cross finely hand-carved from natural olive wood. Features intricate interlocking Coptic cross designs with a smooth finish and a comfortable grip size.",
-    price: 350,
-    category_id: "cat-11",
-    stock_quantity: 45,
-    images: [
-      "https://images.unsplash.com/photo-1594897030264-ab7d87efc473?auto=format&fit=crop&w=600&q=80"
-    ],
-    specifications: {
-      "الخشب": "خشب زيتون طبيعي مبارك",
-      "الطول": "١٨ سم",
-      "الصناعة": "محفور يدوياً بالأراضي المقدسة"
-    },
-    variants: [],
-    rating: 4.6,
-    review_count: 14,
-    is_featured: false,
-    is_best_seller: true,
     is_new_arrival: false,
     is_limited_edition: false
   },
   {
-    id: "prod-12",
-    sku: "TS-ALT-COV-01",
-    name_ar: "أغطية مذبح حرير مطرزة بالذهبي (٣ قطع)",
-    name_en: "Silk Embroidered Altar Covers Set (3 pcs)",
-    description_ar: "طقم أغطية المذبح المقدس (الأبروسفارين واللفائف) مصنوع من الحرير الطبيعي ذو اللون الأبيض والذهبي، ومطرز بالخيوط اللامعة بعبارات التقديس ورسومات الصليب القبطي الأرثوذكسي.",
-    description_en: "Holy altar covers set (including the Prospharin and veils) made of fine white and gold silk, embroidered with holy texts and Coptic Orthodox cross patterns. Elegant and liturgical.",
-    price: 1950,
-    category_id: "cat-12",
+    id: "prod-shoria-large",
+    sku: "TS-SHO-LRG",
+    name_ar: "شورية كبيرة",
+    name_en: "Large Shoria",
+    description_ar: "شورية كنسية كبيرة الحجم متوفرة باللونين الذهبي والفضي.",
+    description_en: "Large church Shoria, available in gold and silver.",
+    price: 1100,
+    category_id: "cat-5",
     stock_quantity: 12,
-    images: [
-      "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80"
-    ],
+    images: ["/images/شوريه.jpg"],
     specifications: {
-      "الخامة": "ستان حريري ثقيل",
-      "العدد": "٣ قطع (أبروسفارين + لفيفتين)",
-      "التطريز": "خيوط ذهبية وفضية ناصعة"
-    },
-    variants: [],
-    rating: 4.8,
-    review_count: 9,
-    is_featured: false,
-    is_best_seller: false,
-    is_new_arrival: false,
-    is_limited_edition: false
-  },
-  {
-    id: "prod-13",
-    sku: "TS-WOD-LEC-01",
-    name_ar: "حامل إنجيل خشبي منقوش بالصلبان والأركان",
-    name_en: "Hand-Carved Wooden Altar Lectern",
-    description_ar: "منجلية صغيرة (حامل إنجيل) للمذبح مصنوعة من خشب الأرو الفاخر، محفور عليها يدوياً الصليب القبطي وزخارف كنسية من كافة الجوانب، قابلة لتعديل زاوية القراءة.",
-    description_en: "Small altar lectern/analogion hand-crafted from luxury oak wood. Featuring hand-carved Coptic crosses and traditional ornaments on all sides, with adjustable angles for easy reading.",
-    price: 2600,
-    discount_price: 2400,
-    category_id: "cat-13",
-    stock_quantity: 6,
-    images: [
-      "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=600&q=80"
-    ],
-    specifications: {
-      "نوع الخشب": "خشب أرو أحمر أمريكي",
-      "الارتفاع": "٣٥ سم (مطوي)",
-      "العرض": "٣٠ سم"
-    },
-    variants: [],
-    rating: 4.9,
-    review_count: 11,
-    is_featured: true,
-    is_best_seller: false,
-    is_new_arrival: true,
-    is_limited_edition: false
-  },
-  {
-    id: "prod-14",
-    sku: "TS-GIF-CRS-01",
-    name_ar: "ميدالية صليب فضة قبطي تذكاري",
-    name_en: "Coptic Silver Cross Commemorative Medallion",
-    description_ar: "ميدالية وقلادة صليب قبطي كلاسيكي مصنوعة من الفضة الخالصة عيار ٩٢٥ مع علبة قطيفة فاخرة. هدية تذكارية رائعة للمناسبات الكنسية كالمعمودية والزيجة المترفة.",
-    description_en: "A Coptic silver cross pendant made of genuine 925 sterling silver, comes in a luxury velvet gift box. An elegant spiritual gift for baptisms, weddings, and special events.",
-    price: 580,
-    category_id: "cat-14",
-    stock_quantity: 40,
-    images: [
-      "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=600&q=80"
-    ],
-    specifications: {
-      "الخامة": "فضة استرليني عيار ٩٢٥",
-      "الوزن": "١٢ جرام",
-      "الملحقات": "سلسلة فضية + علبة قطيفة حمراء بفرش أبيض"
-    },
-    variants: [],
-    rating: 4.7,
-    review_count: 20,
-    is_featured: false,
-    is_best_seller: true,
-    is_new_arrival: false,
-    is_limited_edition: false
-  },
-  {
-    id: "prod-15",
-    sku: "TS-DEA-BOK-01",
-    name_ar: "كتاب خدمة الشماس المقدس والألحان",
-    name_en: "The Deacon's Service Liturgical Handbook",
-    description_ar: "كتاب شامل يجمع كافة مردودات الشماس للقداسات والصلوات الطقسية وعشية وباكر باللغتين القبطية والعربية مع شرح مبسط للطقوس والحركات بالمذبح.",
-    description_en: "A comprehensive handbook compiling all deacon responses for liturgies, vespers, and morning prayers in both parallel Coptic and Arabic, alongside brief explanations of altar rituals.",
-    price: 120,
-    category_id: "cat-15",
-    stock_quantity: 100,
-    images: [
-      "https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?auto=format&fit=crop&w=600&q=80"
-    ],
-    specifications: {
-      "التجليد": "جلد كرتوني قوي مقوى",
-      "عدد الصفحات": "٣٤٠ صفحة",
-      "الناشر": "مكتبة طاكسيس القبطية"
-    },
-    variants: [],
-    rating: 4.8,
-    review_count: 35,
-    is_featured: false,
-    is_best_seller: true,
-    is_new_arrival: false,
-    is_limited_edition: false
-  },
-  {
-    id: "prod-16",
-    sku: "TS-CHU-CAN-01",
-    name_ar: "شمع دان كنسي نحاسي كبير للمذبح",
-    name_en: "Large Liturgical Brass Altar Candelabra",
-    description_ar: "شمع دان كنسي من النحاس المسبوك الثقيل واللامع، مزود بـ ٣ شمعات تعلوها صلبان قبطية منقوشة بدقة. مخصص ليوضع على جانبي المذبح أو أمام الهيكل.",
-    description_en: "A heavy cast-brass church candelabra holding 3 candles, topped with finely engraved Coptic crosses. Designed for placement flanking the altar or in front of the sanctuary.",
-    price: 4800,
-    category_id: "cat-16",
-    stock_quantity: 4,
-    images: [
-      "https://images.unsplash.com/photo-1478147427282-58a87a120781?auto=format&fit=crop&w=600&q=80"
-    ],
-    specifications: {
-      "الخامة": "نحاس أصفر ثقيل مصقول",
-      "الارتفاع": "٨٥ سم",
-      "عدد الشموع": "٣ شمعات (قاعدة مخصصة)"
-    },
-    variants: [],
-    rating: 5.0,
-    review_count: 2,
-    is_featured: false,
-    is_best_seller: false,
-    is_new_arrival: false,
-    is_limited_edition: true
-  },
-  {
-    id: "prod-17",
-    sku: "TS-MON-INC-01",
-    name_ar: "بخور ديري طبيعي فاخر برائحة الياسمين",
-    name_en: "Premium Natural Monastery Jasmine Incense",
-    description_ar: "بخور طبيعي فاخر يتم تحضيره وتعبئته يدوياً بأيدي آباء الرهبان بالأديرة المصرية. يتميز برائحة ذكية تدوم طويلاً ودخان خفيف مريح للتنفس داخل الكنيسة.",
-    description_en: "Premium natural incense hand-prepared and packaged by monks in historic Egyptian monasteries. Features a long-lasting jasmine aroma and a gentle, respiratory-friendly smoke.",
-    price: 150,
-    category_id: "cat-17",
-    stock_quantity: 120,
-    images: [
-      "https://images.unsplash.com/photo-1548625361-155de6c7f54d?auto=format&fit=crop&w=600&q=80"
-    ],
-    specifications: {
-      "نوع الرائحة": "ياسمين ملكي (متوفر صندل وبخور بري)",
-      "الوزن": "٢٥٠ جرام (ربع كيلو)",
-      "المنشأ": "دير السريان العامر"
+      "الحجم": "كبيرة"
     },
     variants: [
-      { type: "color", options: ["ياسمين", "بخور بري", "صندل فاخر"] }
+      {
+        type: "اللون",
+        options: [
+          "فضي (١١٠٠ جنيه)",
+          "ذهبي (١٢٠٠ جنيه)"
+        ]
+      }
     ],
-    rating: 4.9,
-    review_count: 42,
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-shoria-medium",
+    sku: "TS-SHO-MED",
+    name_ar: "شورية وسط",
+    name_en: "Medium Shoria",
+    description_ar: "شورية كنسية متوسطة الحجم متوفرة باللونين الذهبي والفضي.",
+    description_en: "Medium church Shoria, available in gold and silver.",
+    price: 900,
+    category_id: "cat-5",
+    stock_quantity: 15,
+    images: ["/images/شوريه.jpg"],
+    specifications: {
+      "الحجم": "وسط"
+    },
+    variants: [
+      {
+        type: "اللون",
+        options: [
+          "فضي (٩٠٠ جنيه)",
+          "ذهبي (١٠٠٠ جنيه)"
+        ]
+      }
+    ],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-shoria-small",
+    sku: "TS-SHO-SML",
+    name_ar: "شورية صغيرة",
+    name_en: "Small Shoria",
+    description_ar: "شورية كنسية صغيرة الحجم متوفرة باللونين الذهبي والفضي.",
+    description_en: "Small church Shoria, available in gold and silver.",
+    price: 700,
+    category_id: "cat-5",
+    stock_quantity: 20,
+    images: ["/images/شوريه.jpg"],
+    specifications: {
+      "الحجم": "صغيرة"
+    },
+    variants: [
+      {
+        type: "اللون",
+        options: [
+          "فضي (٧٠٠ جنيه)",
+          "ذهبي (٨٠٠ جنيه)"
+        ]
+      }
+    ],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-shoria-filigree",
+    sku: "TS-SHO-FIL-GLD",
+    name_ar: "شورية نحاس شفتشي طلاء ذهبي",
+    name_en: "Filigree Brass Shoria Gold-Plated",
+    description_ar: "شورية نحاس شفتشي فاخرة مع طلاء ذهبي ممتاز وتفاصيل دقيقة يدوية.",
+    description_en: "Premium filigree brass Shoria, gold-plated with intricate hand-made details.",
+    price: 5000,
+    category_id: "cat-5",
+    stock_quantity: 3,
+    images: ["/images/شوريه.jpg"],
+    specifications: {
+      "الخامة": "نحاس شفتشي مطلي ذهب"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: true,
+    is_best_seller: true,
+    is_new_arrival: true,
+    is_limited_edition: true
+  },
+
+  // 6- اواني المذبح
+  {
+    id: "prod-vessels-brass",
+    sku: "TS-VES-BRS-NEW",
+    name_ar: "أواني مذبح نحاس",
+    name_en: "Brass Altar Vessels",
+    description_ar: "طقم أواني مذبح مصنوع من النحاس لخدمة القداس الإلهي.",
+    description_en: "Altar vessels set made of brass for divine liturgy.",
+    price: 1500,
+    category_id: "cat-6",
+    stock_quantity: 10,
+    images: ["/images/اواني مذبح.jpg"],
+    specifications: {
+      "الخامة": "نحاس"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: true,
+    is_best_seller: true,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+
+  // 7- كتب الكنيسه
+  {
+    id: "prod-book-khollagy-masoudi",
+    sku: "TS-BOK-KHL-MAS",
+    name_ar: "خولاجي عبد المسيح المسعودي",
+    name_en: "Khollagy Abdel-Masih Al-Masoudi",
+    description_ar: "كتاب الخولاجي المقدس بتحقيق وإعداد القمص عبد المسيح المسعودي.",
+    description_en: "The Holy Khollagy book edited by Fr. Abdel-Masih Al-Masoudi.",
+    price: 250,
+    category_id: "cat-7",
+    stock_quantity: 40,
+    images: [],
+    specifications: {
+      "المؤلف": "القمص عبد المسيح المسعودي"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: true,
+    is_best_seller: true,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+
+  // 8- الصلبان
+  {
+    id: "prod-cross-ivory",
+    sku: "TS-CRS-IVR",
+    name_ar: "صليب عاج",
+    name_en: "Ivory Cross",
+    description_ar: "صليب يد مصنوع من العاج الطبيعي الفاخر.",
+    description_en: "Hand cross crafted from premium natural ivory.",
+    price: 500,
+    category_id: "cat-8",
+    stock_quantity: 15,
+    images: [],
+    specifications: {
+      "الخامة": "عاج طبيعي"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+
+  // 9- مستلزمات المذبح
+  {
+    id: "prod-incense-box",
+    sku: "TS-ALT-INC-BOX",
+    name_ar: "درج بخور",
+    name_en: "Incense Box",
+    description_ar: "درج بخور خشبي فاخر لحفظ البخور على المذبح.",
+    description_en: "Premium wooden incense box for altar use.",
+    price: 500,
+    category_id: "cat-9",
+    stock_quantity: 15,
+    images: [],
+    specifications: {
+      "الخامة": "خشب"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-altar-setup",
+    sku: "TS-ALT-COMP-SET",
+    name_ar: "تجهيز مذبح كامل",
+    name_en: "Complete Altar Setup",
+    description_ar: "تجهيز مذبح كامل يشتمل على: درج بخور، كرسي كاس، صليب افنوتي ناي نان، صليبين وبشارة.",
+    description_en: "Complete altar setup including: incense box, chalice throne, Evnouti Nai Nan cross, two crosses, and a Bishara.",
+    price: 2500,
+    category_id: "cat-9",
+    stock_quantity: 5,
+    images: ["/images/فرش مذبج.jpg", "/images/كرسي الكاس.jpg", "/images/صليب افنوتي ناي نان.jpg"],
+    specifications: {
+      "المشتملات": "درج بخور، كرسي كاس، صليب افنوتي ناي نان، صليبين وبشارة"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: true,
+    is_best_seller: true,
+    is_new_arrival: true,
+    is_limited_edition: false
+  },
+
+  // 10- الاعمال الخشبيه والحفر
+  {
+    id: "prod-eng-coaster",
+    sku: "TS-WOD-COASTER",
+    name_ar: "حفر كوستر",
+    name_en: "Engraved Coaster",
+    description_ar: "كوستر خشبي محفور ليزر برسومات كنسية وصور القديسين.",
+    description_en: "Laser engraved wooden coaster with church ornaments and saints.",
+    price: 20,
+    category_id: "cat-10",
+    stock_quantity: 300,
+    images: ["/images/حفر كوستر خشب.jpg"],
+    specifications: {
+      "الخامة": "خشب طبيعي"
+    },
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
     is_featured: true,
     is_best_seller: true,
     is_new_arrival: false,
     is_limited_edition: false
   },
   {
-    id: "prod-18",
-    sku: "TS-CUS-PEC-01",
-    name_ar: "صليب صدر مخصص للآباء الكهنة فضة مذهبة",
-    name_en: "Custom Pectoral Cross for Priests (Silver-Gold)",
-    description_ar: "صليب صدر كهنوتي يصنع بالطلب الخاص، مصنوع من الفضة ومطلي بطبقة سميكة من الذهب، ويطعم بالأحجار الكريمة الحمراء أو الخضراء حسب الرغبة. يشتمل على سلسلة فضية طويلة.",
-    description_en: "A priest's pectoral cross custom-crafted to order. Made of sterling silver and plated in a thick layer of gold, set with red or green gemstone cabochons as requested. Comes with a matching silver chain.",
-    price: 7500,
-    category_id: "cat-18",
-    stock_quantity: 10,
-    images: [
-      "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=600&q=80"
-    ],
+    id: "prod-eng-pen",
+    sku: "TS-WOD-PEN",
+    name_ar: "حفر قلم",
+    name_en: "Engraved Touch Pen",
+    description_ar: "قلم تاتش محفور بالليزر بالاسم أو الإهداء.",
+    description_en: "Touch pen laser engraved with names or custom dedication.",
+    price: 20,
+    category_id: "cat-10",
+    stock_quantity: 500,
+    images: ["/images/حفر قلم تاتش.jpg"],
+    specifications: {},
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+  {
+    id: "prod-eng-medals",
+    sku: "TS-WOD-MEDALS",
+    name_ar: "حفر ميداليات",
+    name_en: "Engraved Medallions",
+    description_ar: "ميداليات خشبية محفورة ليزر بتصاميم وشعارات مسيحية.",
+    description_en: "Laser engraved wooden medallions with Christian designs and logos.",
+    price: 20,
+    category_id: "cat-10",
+    stock_quantity: 400,
+    images: ["/images/حفر ميدليات.jpg"],
     specifications: {
-      "الخامة": "فضة ٩٢٥ مطلية ذهب عيار ٢١",
-      "الأحجار": "زركون أحمر ياقوتي عالي الجودة",
-      "مدة التصنيع": "٧ إلى ١٠ أيام عمل"
+      "الخامة": "خشب"
     },
     variants: [],
     rating: 5.0,
-    review_count: 6,
-    is_featured: true,
+    review_count: 0,
+    is_featured: false,
     is_best_seller: false,
-    is_new_arrival: true,
-    is_limited_edition: true
+    is_new_arrival: false,
+    is_limited_edition: false
   },
   {
-    id: "prod-19",
-    sku: "TS-OTH-OIL-01",
-    name_ar: "زيت زيتون نقي معصور على البارد للمذبح",
-    name_en: "Cold-Pressed Pure Olive Oil for Altar Lamps",
-    description_ar: "زيت زيتون بكر نقي ١٠٠٪ معصور على البارد ومنقى خصيصاً لإيقاد قناديل المذبح وهياكل القديسين. يتميز بالثبات وعدم انبعاث روائح أو دخان كثيف.",
-    description_en: "100% pure extra virgin cold-pressed olive oil, filtered specifically for burning in altar sanctuary lamps. Provides a clean, steady burn without heavy smoke or chemical fumes.",
-    price: 180,
-    category_id: "cat-19",
-    stock_quantity: 60,
-    images: [
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80"
-    ],
+    id: "prod-eng-bracelets",
+    sku: "TS-WOD-BRACELET",
+    name_ar: "حفر حظاظات جلد",
+    name_en: "Engraved Leather Bracelets",
+    description_ar: "حظاظات جلدية محفورة بالليزر مع صلبان أو آيات.",
+    description_en: "Laser engraved leather bracelets with crosses or verses.",
+    price: 20,
+    category_id: "cat-10",
+    stock_quantity: 250,
+    images: ["/images/حفر حظاظات جلد.jpg"],
     specifications: {
-      "الحجم": "١ لتر",
-      "التعبئة": "عبوة بلاستيكية معتمة لحفظ الجودة",
-      "المنشأ": "مزارع أديرة وادي النطرون"
+      "الخامة": "جلد"
     },
     variants: [],
-    rating: 4.8,
-    review_count: 28,
+    rating: 5.0,
+    review_count: 0,
+    is_featured: false,
+    is_best_seller: false,
+    is_new_arrival: false,
+    is_limited_edition: false
+  },
+
+  // 11- Others
+  {
+    id: "prod-bishara",
+    sku: "TS-OTH-BISHARA",
+    name_ar: "بشارة",
+    name_en: "Bishara (Gospel Cover)",
+    description_ar: "بشارة الإنجيل المقدس مطرزة أو معدنية فاخرة.",
+    description_en: "Liturgical Gospel cover (Bishara), embroidered or metal.",
+    price: 0,
+    category_id: "cat-11",
+    stock_quantity: 10,
+    images: [],
+    specifications: {},
+    variants: [],
+    rating: 5.0,
+    review_count: 0,
     is_featured: false,
     is_best_seller: false,
     is_new_arrival: false,
@@ -614,7 +834,7 @@ export const BRANCHES: Branch[] = [
     phone: "0235469946",
     google_maps_url: "https://maps.app.goo.gl/awRQwkFZ7hssuEky7",
     coordinates: { lat: 29.9984, lng: 31.2023 },
-    image: "https://images.unsplash.com/photo-1478147427282-58a87a120781?auto=format&fit=crop&w=500&q=80"
+    image: ""
   },
   {
     id: "branch-zaytoun",
@@ -627,7 +847,7 @@ export const BRANCHES: Branch[] = [
     phone: "0226394044",
     google_maps_url: "https://maps.app.goo.gl/Ue7yZRSDnKj8yAE89",
     coordinates: { lat: 30.1032, lng: 31.3094 },
-    image: "https://images.unsplash.com/photo-1548625361-155de6c7f54d?auto=format&fit=crop&w=500&q=80"
+    image: ""
   }
 ];
 
